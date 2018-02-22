@@ -1,10 +1,12 @@
 package io.github.vladimirmi.popularmovies.data.net;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.concurrent.TimeUnit;
 
 import io.github.vladimirmi.popularmovies.BuildConfig;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -53,6 +55,7 @@ public class RestServiceProvider {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(createConvertFactory())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .client(okHttp)
                 .build();
     }

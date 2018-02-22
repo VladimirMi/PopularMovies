@@ -1,14 +1,17 @@
 package io.github.vladimirmi.popularmovies.data.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.squareup.moshi.Json;
 
 import java.util.List;
 
 /**
- * JavaBean class that represents a Movie model.
+ * A JavaBean object that represents a Movie model.
  */
 
-public class Movie {
+public class Movie implements Parcelable {
 
     /**
      * vote_count : 492
@@ -30,7 +33,7 @@ public class Movie {
     @Json(name = "vote_count") private int voteCount;
     @Json(name = "id") private int id;
     @Json(name = "video") private boolean video;
-    @Json(name = "vote_average") private int voteAverage;
+    @Json(name = "vote_average") private double voteAverage;
     @Json(name = "title") private String title;
     @Json(name = "popularity") private double popularity;
     @Json(name = "poster_path") private String posterPath;
@@ -41,6 +44,56 @@ public class Movie {
     @Json(name = "overview") private String overview;
     @Json(name = "release_date") private String releaseDate;
     @Json(name = "genre_ids") private List<Integer> genreIds;
+
+    protected Movie(Parcel in) {
+        voteCount = in.readInt();
+        id = in.readInt();
+        video = in.readByte() != 0;
+        voteAverage = in.readDouble();
+        title = in.readString();
+        popularity = in.readDouble();
+        posterPath = in.readString();
+        originalLanguage = in.readString();
+        originalTitle = in.readString();
+        backdropPath = in.readString();
+        adult = in.readByte() != 0;
+        overview = in.readString();
+        releaseDate = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(voteCount);
+        dest.writeInt(id);
+        dest.writeByte((byte) (video ? 1 : 0));
+        dest.writeDouble(voteAverage);
+        dest.writeString(title);
+        dest.writeDouble(popularity);
+        dest.writeString(posterPath);
+        dest.writeString(originalLanguage);
+        dest.writeString(originalTitle);
+        dest.writeString(backdropPath);
+        dest.writeByte((byte) (adult ? 1 : 0));
+        dest.writeString(overview);
+        dest.writeString(releaseDate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public int getVoteCount() {
         return voteCount;
@@ -66,11 +119,11 @@ public class Movie {
         this.video = video;
     }
 
-    public int getVoteAverage() {
+    public double getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(int voteAverage) {
+    public void setVoteAverage(double voteAverage) {
         this.voteAverage = voteAverage;
     }
 
