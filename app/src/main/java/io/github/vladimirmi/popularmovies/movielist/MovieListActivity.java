@@ -1,23 +1,14 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.movielist;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
-
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.dummy.DummyContent;
-
-import java.util.List;
+import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailActivity;
 
 /**
  * An activity representing a list of Movies. This activity
@@ -42,24 +33,17 @@ public class MovieListActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+//        toolbar.setTitle(getTitle());
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
         }
-
-        View recyclerView = findViewById(R.id.movie_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView();
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+    private void setupRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.movie_list);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(new MovieAdapter(this, DummyContent.ITEMS, mTwoPane));
     }
-
-
 }

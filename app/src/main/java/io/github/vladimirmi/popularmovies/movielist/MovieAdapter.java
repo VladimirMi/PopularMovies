@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.movielist;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +11,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.dummy.DummyContent;
+import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailActivity;
+import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailFragment;
 
 /**
  * Created by Vladimir Mikhalev 21.02.2018.
@@ -55,7 +58,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.movie_list_content, parent, false);
+                .inflate(R.layout.item_movie, parent, false);
         return new ViewHolder(view);
     }
 

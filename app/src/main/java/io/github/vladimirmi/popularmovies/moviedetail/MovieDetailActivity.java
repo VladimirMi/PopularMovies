@@ -1,14 +1,14 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.moviedetail;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import io.github.vladimirmi.popularmovies.R;
+import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
 
 /**
  * An activity representing a single Movie detail screen. This
@@ -24,10 +24,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();

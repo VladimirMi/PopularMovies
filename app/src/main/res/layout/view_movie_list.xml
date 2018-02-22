@@ -9,6 +9,6 @@
                                         android:layout_marginLeft="16dp"
                                         android:layout_marginRight="16dp"
                                         app:layoutManager="LinearLayoutManager"
-                                        tools:context="io.github.vladimirmi.popularmovies.MovieListActivity"
-                                        tools:listitem="@layout/movie_list_content"
+                                        tools:context="io.github.vladimirmi.popularmovies.movielist.MovieListActivity"
+                                        tools:listitem="@layout/item_movie"
     />
