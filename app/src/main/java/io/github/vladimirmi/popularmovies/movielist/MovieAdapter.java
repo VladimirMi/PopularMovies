@@ -15,21 +15,27 @@ import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 
 /**
- * Created by Vladimir Mikhalev 21.02.2018.
+ * Provides a binding from an {@link Movie} data set to views that are displayed
+ * within a {@link RecyclerView}.</p>
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
-    private List<Movie> mMovies = new ArrayList<>();
+    private static final float POSTER_ASPECT_RATIO = 2f / 3f;
     private final OnMovieClickListener mListener;
+    private List<Movie> mMovies = new ArrayList<>();
+
+    private int mPosterWidth = 0;
+    private int mPosterHeight = 0;
 
     MovieAdapter(OnMovieClickListener clickListener) {
         mListener = clickListener;
     }
 
-    public void setData(List<Movie> movies) {
-        mMovies = movies;
-        notifyDataSetChanged();
+    public void addData(List<Movie> movies) {
+        int oldSize = mMovies.size();
+        mMovies.addAll(movies);
+        notifyItemRangeChanged(oldSize, movies.size());
     }
 
     @Override
@@ -37,11 +43,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_movie, parent, false);
         ViewGroup.LayoutParams lp = view.getLayoutParams();
-        int spanCount = ((GridLayoutManager) ((RecyclerView) parent).getLayoutManager()).getSpanCount();
-        lp.width = Utils.getDisplayMetrics(parent.getContext()).widthPixels / spanCount;
-        lp.height = (int) (lp.width * 1.5);
+        if (mPosterWidth == 0) {
+            calculatePosterSize(parent);
+        }
+        lp.width = mPosterWidth;
+        lp.height = mPosterHeight;
         view.setLayoutParams(lp);
         return new MovieViewHolder(view);
+    }
+
+    private void calculatePosterSize(ViewGroup parent) {
+        int spanCount = ((GridLayoutManager) ((RecyclerView) parent).getLayoutManager()).getSpanCount();
+        mPosterWidth = Utils.getDisplayMetrics(parent.getContext()).widthPixels / spanCount;
+        mPosterHeight = (int) (mPosterWidth / POSTER_ASPECT_RATIO);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class RestServiceProvider {
 
     private static OkHttpClient createClient() {
         return new OkHttpClient.Builder()
-                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
                 .addNetworkInterceptor(new StethoInterceptor())
                 .addInterceptor(getApiKeyInterceptor())
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)

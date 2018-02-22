@@ -54,7 +54,6 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fetchData();
     }
 
     @Override
@@ -63,14 +62,30 @@ public class MovieListActivity extends AppCompatActivity {
         compDisp.dispose();
     }
 
-    private void fetchData() {
+    private void setupRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.movie_list);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+
+        recyclerView.setLayoutManager(layoutManager);
+        mAdapter = new MovieAdapter(mListener);
+        recyclerView.setAdapter(mAdapter);
+
+        recyclerView.addOnScrollListener(new PaginatedRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page) {
+                fetchData(page);
+            }
+        });
+    }
+
+    private void fetchData(int page) {
         DisposableSingleObserver<PaginatedMoviesResult> disposable =
-                App.getDataManager().getPopularMovies(1)
+                App.getDataManager().getPopularMovies(page)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<PaginatedMoviesResult>() {
                             @Override
                             public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
-                                mAdapter.setData(paginatedMoviesResult.getResults());
+                                mAdapter.addData(paginatedMoviesResult.getResults());
                             }
 
                             @Override
@@ -79,13 +94,6 @@ public class MovieListActivity extends AppCompatActivity {
                             }
                         });
         compDisp.add(disposable);
-    }
-
-    private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.movie_list);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mAdapter = new MovieAdapter(mListener);
-        recyclerView.setAdapter(mAdapter);
     }
 
     private final MovieAdapter.OnMovieClickListener mListener = new MovieAdapter.OnMovieClickListener() {

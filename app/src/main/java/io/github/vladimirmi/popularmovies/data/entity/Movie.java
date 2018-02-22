@@ -8,27 +8,27 @@ import com.squareup.moshi.Json;
 import java.util.List;
 
 /**
- * A JavaBean object that represents a Movie model.
+ * A JavaBean object that represents a JSON Movie model.
+ * <pre>
+ *     {
+ *     "vote_count": 123,
+ *     "id": 123456,
+ *     "video": false,
+ *     "vote_average": 8.3,
+ *     "title": "Movie Title",
+ *     "popularity": 40.508834,
+ *     "poster_path": "/path.jpg",
+ *     "original_language": "en",
+ *     "original_title": "Original Movie Title",
+ *     "genre_ids": [10749,18],
+ *     "backdrop_path": "/path.jpg",
+ *     "adult": false,
+ *     "overview": "Movie overview",
+ *     "release_date": "2017-12-31"
+ *     }</pre>
  */
 
 public class Movie implements Parcelable {
-
-    /**
-     * vote_count : 492
-     * id : 345938
-     * video : false
-     * vote_average : 7
-     * title : The Shack
-     * popularity : 132.041256
-     * poster_path : /doAzav9kfdtsoSdw1MDFvjKq3J4.jpg
-     * original_language : en
-     * original_title : The Shack
-     * genre_ids : [18,14]
-     * backdrop_path : /un7pVnJC2el8YxdIOg6YrSmBTlO.jpg
-     * adult : false
-     * overview : After suffering a family tragedy, Mack Phillips spirals into a deep depression causing him to question his innermost beliefs. Facing a crisis of faith, he receives a mysterious letter urging him to an abandoned shack deep in the Oregon wilderness. Despite his doubts, Mack journeys to the shack and encounters an enigmatic trio of strangers led by a woman named Papa. Through this meeting, Mack finds important truths that will transform his understanding of his tragedy and change his life forever.
-     * release_date : 2017-03-03
-     */
 
     @Json(name = "vote_count") private int voteCount;
     @Json(name = "id") private int id;
