@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import io.github.vladimirmi.popularmovies.R;
-
 /**
  * Created by Vladimir Mikhalev 22.02.2018.
  */
@@ -30,7 +28,6 @@ public class Utils {
                 .centerCrop()
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                .placeholder(R.color.colorPrimary)
                 .crossFade()
                 .into(view);
     }

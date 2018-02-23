@@ -106,7 +106,7 @@ public class MovieListActivity extends AppCompatActivity {
     private void setupSpinner() {
         Spinner spinner = findViewById(R.id.sort_by_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_by, android.R.layout.simple_spinner_item);
+                R.array.sort_by, R.layout.item_spinner_sort_by);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setSelection(App.getDataManager().getSortBy().ordinal());
