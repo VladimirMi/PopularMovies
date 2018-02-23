@@ -54,4 +54,11 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
      * @param page Number of the page to load.
      */
     public abstract void onLoadMore(int page);
+
+    public void reset() {
+        mLoadedPage = 0;
+        mPreviousItemCount = 0;
+        mLoading = false;
+        loadMore();
+    }
 }

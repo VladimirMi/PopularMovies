@@ -16,7 +16,7 @@ import io.github.vladimirmi.popularmovies.utils.Utils;
 
 /**
  * Provides a binding from an {@link Movie} data set to views that are displayed
- * within a {@link RecyclerView}.</p>
+ * within a {@link RecyclerView}.
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
@@ -36,6 +36,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         int oldSize = mMovies.size();
         mMovies.addAll(movies);
         notifyItemRangeChanged(oldSize, movies.size());
+    }
+
+    public void resetData() {
+        mMovies = new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @Override

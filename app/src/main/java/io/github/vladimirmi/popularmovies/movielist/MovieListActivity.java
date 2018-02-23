@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import io.github.vladimirmi.popularmovies.App;
 import io.github.vladimirmi.popularmovies.R;
@@ -13,10 +17,9 @@ import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
 import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailActivity;
 import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailFragment;
+import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
-import timber.log.Timber;
 
 /**
  * An activity representing a list of Movies. This activity
@@ -35,6 +38,9 @@ public class MovieListActivity extends AppCompatActivity {
     private boolean mTwoPane;
     private MovieAdapter mAdapter;
     private CompositeDisposable compDisp = new CompositeDisposable();
+    private Sort sortBy = Sort.POPULAR;
+    private boolean sortChanged = false;
+    private PaginatedRecyclerViewScrollListener mPaginatedRecyclerViewScrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +49,8 @@ public class MovieListActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        toolbar.setTitle(getTitle());
+
+        setupSpinner();
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
@@ -52,48 +59,9 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         compDisp.dispose();
-    }
-
-    private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.movie_list);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-
-        recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new MovieAdapter(mListener);
-        recyclerView.setAdapter(mAdapter);
-
-        recyclerView.addOnScrollListener(new PaginatedRecyclerViewScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page) {
-                fetchData(page);
-            }
-        });
-    }
-
-    private void fetchData(int page) {
-        DisposableSingleObserver<PaginatedMoviesResult> disposable =
-                App.getDataManager().getPopularMovies(page)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableSingleObserver<PaginatedMoviesResult>() {
-                            @Override
-                            public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
-                                mAdapter.addData(paginatedMoviesResult.getResults());
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e);
-                            }
-                        });
-        compDisp.add(disposable);
     }
 
     private final MovieAdapter.OnMovieClickListener mListener = new MovieAdapter.OnMovieClickListener() {
@@ -115,4 +83,86 @@ public class MovieListActivity extends AppCompatActivity {
             }
         }
     };
+
+
+    private void setupRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.movie_list);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+
+        recyclerView.setLayoutManager(layoutManager);
+        mAdapter = new MovieAdapter(mListener);
+        recyclerView.setAdapter(mAdapter);
+
+        mPaginatedRecyclerViewScrollListener = new PaginatedRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page) {
+                fetchData(page);
+            }
+        };
+        recyclerView.addOnScrollListener(mPaginatedRecyclerViewScrollListener);
+    }
+
+    private void setupSpinner() {
+        Spinner spinner = findViewById(R.id.sort_by_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_by, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                sortBy = Sort.values()[position];
+                sortChanged = true;
+                mPaginatedRecyclerViewScrollListener.reset();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void fetchData(int page) {
+        if (sortBy == Sort.POPULAR) {
+            fetchPopularMovies(page);
+        } else if (sortBy == Sort.TOP_RATED) {
+            fetchTopRatedMovies(page);
+        }
+    }
+
+    private void fetchPopularMovies(int page) {
+        compDisp.dispose();
+        compDisp.add(App.getDataManager().getPopularMovies(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new SimpleSingleObserver<PaginatedMoviesResult>() {
+                    @Override
+                    public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
+                        setData(paginatedMoviesResult);
+                    }
+                }));
+    }
+
+    private void fetchTopRatedMovies(int page) {
+        compDisp.dispose();
+        compDisp.add(App.getDataManager().getTopRatedMovies(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new SimpleSingleObserver<PaginatedMoviesResult>() {
+                    @Override
+                    public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
+                        setData(paginatedMoviesResult);
+                    }
+                }));
+    }
+
+    private void setData(PaginatedMoviesResult paginatedMoviesResult) {
+        if (sortChanged) {
+            mAdapter.resetData();
+            sortChanged = false;
+        }
+        mAdapter.addData(paginatedMoviesResult.getResults());
+    }
+
+    enum Sort {
+        POPULAR, TOP_RATED
+    }
 }
