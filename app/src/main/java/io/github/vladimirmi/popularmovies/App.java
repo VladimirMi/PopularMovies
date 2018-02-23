@@ -6,6 +6,7 @@ import com.facebook.stetho.Stetho;
 
 import io.github.vladimirmi.popularmovies.data.DataManager;
 import io.github.vladimirmi.popularmovies.data.net.RestServiceProvider;
+import io.github.vladimirmi.popularmovies.data.preferences.PreferencesManager;
 import timber.log.Timber;
 
 /**
@@ -26,7 +27,8 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        sDataManager = new DataManager(RestServiceProvider.getService());
+        sDataManager = new DataManager(RestServiceProvider.getService(),
+                new PreferencesManager(getApplicationContext()));
     }
 
     public static DataManager getDataManager() {

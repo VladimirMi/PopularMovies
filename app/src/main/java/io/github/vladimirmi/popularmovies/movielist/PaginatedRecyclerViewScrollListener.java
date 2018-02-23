@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 /**
  * {@link RecyclerView.OnScrollListener}, witch handles pagination by calling
  * {@link #onLoadMore(int)}} when from the last visible item to end of the list,
- * less then half of page size is left.<br>
+ * less then half of page size is left.
  * <p>
  * Default page size is 20.
  */
@@ -16,7 +16,7 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
     private static final int PAGE_SIZE = 20;
     private static final int THRESHOLD = PAGE_SIZE / 2;
 
-    private int mLoadedPage = 0;
+    private int mLoadedPages = 0;
     private int mPreviousItemCount = 0;
     private boolean mLoading = false;
 
@@ -24,7 +24,7 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
 
     public PaginatedRecyclerViewScrollListener(GridLayoutManager layoutManager) {
         mLayoutManager = layoutManager;
-        loadMore();
+        mPreviousItemCount = mLayoutManager.getItemCount();
     }
 
     @Override
@@ -37,15 +37,20 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
             mPreviousItemCount = itemCount;
         }
 
-        if (!mLoading && lastVisibleItemPosition + THRESHOLD > PAGE_SIZE * mLoadedPage) {
+        if (!mLoading && lastVisibleItemPosition + THRESHOLD > PAGE_SIZE * mLoadedPages) {
             loadMore();
         }
     }
 
-    private void loadMore() {
-        mLoadedPage++;
+    public void loadMore() {
         mLoading = true;
-        onLoadMore(mLoadedPage);
+        onLoadMore(++mLoadedPages);
+    }
+
+    public void reset() {
+        mLoadedPages = 0;
+        mPreviousItemCount = 0;
+        mLoading = false;
     }
 
     /**
@@ -54,11 +59,4 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
      * @param page Number of the page to load.
      */
     public abstract void onLoadMore(int page);
-
-    public void reset() {
-        mLoadedPage = 0;
-        mPreviousItemCount = 0;
-        mLoading = false;
-        loadMore();
-    }
 }
