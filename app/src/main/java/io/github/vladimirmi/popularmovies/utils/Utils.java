@@ -27,7 +27,7 @@ public class Utils {
                 .load(getImagePath(width, path))
                 .centerCrop()
                 .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .crossFade()
                 .into(view);
     }

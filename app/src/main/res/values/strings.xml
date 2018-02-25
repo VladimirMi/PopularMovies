@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="title_movie_detail">Movie Detail</string>
+    <string name="movie_rating">Rating:</string>
+    <string name="movie_release">Release date:</string>
+    <string name="movie_overview">Overview:</string>
+    <string name="movie_poster">Movie poster</string>
 
     <string-array name="sort_by">
         <item>Most popular</item>

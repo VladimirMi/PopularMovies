@@ -13,21 +13,14 @@ import android.widget.Spinner;
 
 import io.github.vladimirmi.popularmovies.App;
 import io.github.vladimirmi.popularmovies.R;
-import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
 import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailActivity;
-import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailFragment;
 import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
- * An activity representing a list of Movies. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link MovieDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
+ * An activity representing a list of Movies.
  */
 public class MovieListActivity extends AppCompatActivity {
 
@@ -35,7 +28,6 @@ public class MovieListActivity extends AppCompatActivity {
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private boolean mTwoPane;
     private MovieAdapter mAdapter;
     private CompositeDisposable mCompDisp = new CompositeDisposable();
     private Sort mSortBy;
@@ -51,10 +43,6 @@ public class MovieListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (findViewById(R.id.movie_detail_container) != null) {
-            mTwoPane = true;
-        }
-
         setupSpinner();
         setupRecyclerView();
     }
@@ -65,24 +53,11 @@ public class MovieListActivity extends AppCompatActivity {
         mCompDisp.dispose();
     }
 
-    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = new MovieAdapter.OnMovieClickListener() {
-        @Override
-        public void onMovieClick(Movie movie) {
-            if (mTwoPane) {
-                Bundle arguments = new Bundle();
-                arguments.putParcelable(MovieDetailFragment.ARG_MOVIE, movie);
-                MovieDetailFragment fragment = new MovieDetailFragment();
-                fragment.setArguments(arguments);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container, fragment)
-                        .commit();
-            } else {
-                Intent intent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
-                intent.putExtra(MovieDetailFragment.ARG_MOVIE, movie);
+    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = movie -> {
+        Intent intent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
+        intent.putExtra(MovieDetailActivity.ARG_MOVIE, movie);
 
-                startActivity(intent);
-            }
-        }
+        startActivity(intent);
     };
 
 
