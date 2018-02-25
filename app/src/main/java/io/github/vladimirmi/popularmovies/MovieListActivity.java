@@ -1,21 +1,21 @@
-package io.github.vladimirmi.popularmovies.movielist;
+package io.github.vladimirmi.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import io.github.vladimirmi.popularmovies.App;
-import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
-import io.github.vladimirmi.popularmovies.moviedetail.MovieDetailActivity;
 import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
+import io.github.vladimirmi.popularmovies.utils.Utils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -24,10 +24,6 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 public class MovieListActivity extends AppCompatActivity {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private MovieAdapter mAdapter;
     private CompositeDisposable mCompDisp = new CompositeDisposable();
     private Sort mSortBy;
@@ -50,24 +46,30 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        mCompDisp.dispose();
+        mCompDisp.clear();
     }
 
-    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = movie -> {
+    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = (itemView, movie) -> {
         Intent intent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
         intent.putExtra(MovieDetailActivity.ARG_MOVIE, movie);
 
-        startActivity(intent);
+        String transitionName = getString(R.string.transition_name);
+        ActivityOptionsCompat options = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(MovieListActivity.this,
+                        itemView.findViewById(R.id.poster), transitionName);
+
+        startActivity(intent, options.toBundle());
     };
 
 
     private void setupRecyclerView() {
         mRecyclerView = findViewById(R.id.movie_list);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, calculateSpanCount());
 
         mRecyclerView.setLayoutManager(layoutManager);
         mAdapter = new MovieAdapter(mOnMovieClickListener);
         mRecyclerView.setAdapter(mAdapter);
+
 
         mPaginatedListener = new PaginatedRecyclerViewScrollListener(layoutManager) {
             @Override
@@ -143,6 +145,20 @@ public class MovieListActivity extends AppCompatActivity {
             mSortByChanged = false;
         }
         mAdapter.addData(paginatedMoviesResult.getResults());
+    }
+
+    private int calculateSpanCount() {
+        final int maxPosterWidth = (int) getResources().getDimension(R.dimen.poster_max_width);
+
+        int spanCount = 0;
+        DisplayMetrics displayMetrics = Utils.getDisplayMetrics(this);
+        int posterWidthDp;
+        do {
+            spanCount++;
+            posterWidthDp = displayMetrics.widthPixels / spanCount;
+        } while (posterWidthDp >= maxPosterWidth);
+
+        return spanCount;
     }
 
     public enum Sort {

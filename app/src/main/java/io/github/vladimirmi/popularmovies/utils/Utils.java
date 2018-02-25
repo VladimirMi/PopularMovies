@@ -15,19 +15,34 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 public class Utils {
 
-    private static final String BASE_URL = "http://image.tmdb.org/t/p/w%d/%s";
+    private static final String BASE_URL = "http://image.tmdb.org/t/p/%s/%s";
 
-    @SuppressLint("DefaultLocale")
-    private static String getImagePath(int width, String path) {
-        return String.format(BASE_URL, width, path);
+    public enum PosterQuality {
+        ORIGINAL("original"),
+        VERY_HIGH("w780"),
+        HIGH("w500"),
+        MID("w342"),
+        LOW("w154"),
+        VERY_LOW("w92");
+
+        final String path;
+
+        PosterQuality(String path) {
+            this.path = path;
+        }
     }
 
-    public static void setImage(ImageView view, String path, int width) {
+    @SuppressLint("DefaultLocale")
+    private static String getImagePath(PosterQuality quality, String path) {
+        return String.format(BASE_URL, quality.path, path);
+    }
+
+    public static void setImage(ImageView view, String path, PosterQuality quality) {
         Glide.with(view.getContext())
-                .load(getImagePath(width, path))
+                .load(getImagePath(quality, path))
                 .centerCrop()
                 .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .crossFade()
                 .into(view);
     }

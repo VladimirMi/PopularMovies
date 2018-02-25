@@ -1,9 +1,9 @@
 package io.github.vladimirmi.popularmovies.data;
 
+import io.github.vladimirmi.popularmovies.MovieListActivity;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
 import io.github.vladimirmi.popularmovies.data.net.RestService;
 import io.github.vladimirmi.popularmovies.data.preferences.PreferencesManager;
-import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
 import io.reactivex.Single;
 
 /**

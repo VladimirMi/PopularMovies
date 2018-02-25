@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies.movielist;
+package io.github.vladimirmi.popularmovies;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
  * Default page size is 20.
  */
 
+@SuppressWarnings("WeakerAccess")
 abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
     private static final int PAGE_SIZE = 20;

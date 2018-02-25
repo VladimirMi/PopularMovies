@@ -1,8 +1,10 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     >
 
     <android.support.design.widget.AppBarLayout
@@ -23,11 +25,17 @@
             app:expandedTitleTextAppearance="@style/ExpandedTextAppearance"
             >
 
-            <ImageView
+            <io.github.vladimirmi.popularmovies.utils.AspectRatioImageView
                 android:id="@+id/poster"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/movie_poster"
+                app:aspectRatioEnabled="true"
+                app:aspectRatio="1.5"
+                app:dominantMeasurement="width"
+                android:transitionName="@string/transition_name"
+                tools:targetApi="lollipop"
+                android:background="@drawable/placeholder"
                 />
 
             <android.support.v7.widget.Toolbar
@@ -35,7 +43,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                android:layout_marginTop="24dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 />
 
@@ -44,7 +51,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
-        android:id="@+id/movie_detail_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"

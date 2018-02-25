@@ -1,7 +1,8 @@
-package io.github.vladimirmi.popularmovies.movielist;
+package io.github.vladimirmi.popularmovies;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 
@@ -20,9 +20,11 @@ import io.github.vladimirmi.popularmovies.utils.Utils;
  * within a {@link RecyclerView}.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
-    private static final float POSTER_ASPECT_RATIO = 2f / 3f;
+    private static final double POSTER_ASPECT_RATIO = 1.5;
+
     private final OnMovieClickListener mListener;
     private List<Movie> mMovies = new ArrayList<>();
 
@@ -60,8 +62,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     private void calculatePosterSize(ViewGroup parent) {
         int spanCount = ((GridLayoutManager) ((RecyclerView) parent).getLayoutManager()).getSpanCount();
-        mPosterWidth = Utils.getDisplayMetrics(parent.getContext()).widthPixels / spanCount;
-        mPosterHeight = (int) (mPosterWidth / POSTER_ASPECT_RATIO);
+        DisplayMetrics displayMetrics = Utils.getDisplayMetrics(parent.getContext());
+        mPosterWidth = displayMetrics.widthPixels / spanCount;
+        mPosterHeight = (int) (mPosterWidth * POSTER_ASPECT_RATIO);
     }
 
     @Override
@@ -90,17 +93,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void bind(Movie movie) {
             mMovie = movie;
             mTitleView.setText(movie.getTitle());
-            Utils.setImage(mPosterView, movie.getPosterPath(), 154);
+            Utils.setImage(mPosterView, movie.getPosterPath(), Utils.PosterQuality.LOW);
         }
 
         @Override
         public void onClick(View v) {
-            mListener.onMovieClick(mMovie);
+            mListener.onMovieClick(itemView, mMovie);
         }
     }
 
     interface OnMovieClickListener {
 
-        void onMovieClick(Movie movie);
+        void onMovieClick(View itemView, Movie movie);
     }
 }

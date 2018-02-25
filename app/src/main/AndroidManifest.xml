@@ -13,9 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".movielist.MovieListActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".MovieListActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,13 +22,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".moviedetail.MovieDetailActivity"
+            android:name=".MovieDetailActivity"
             android:label="@string/title_movie_detail"
-            android:parentActivityName=".movielist.MovieListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".MovieListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.github.vladimirmi.popularmovies.movielist.MovieListActivity"/>
+                android:value="io.github.vladimirmi.popularmovies.MovieListActivity"/>
         </activity>
     </application>
 

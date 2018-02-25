@@ -3,7 +3,7 @@ package io.github.vladimirmi.popularmovies.data.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
+import io.github.vladimirmi.popularmovies.MovieListActivity;
 
 /**
  * Preferences

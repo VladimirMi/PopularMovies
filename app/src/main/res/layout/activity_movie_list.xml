@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="io.github.vladimirmi.popularmovies.movielist.MovieListActivity"
+    tools:context="io.github.vladimirmi.popularmovies.MovieListActivity"
     >
 
     <android.support.design.widget.AppBarLayout
@@ -30,11 +30,11 @@
 
                 <TextView
                     android:id="@+id/toolbar_title"
+                    style="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|start"
                     android:text="@string/app_name"
-                    style="@style/TextAppearance.AppCompat.Title"
                     />
 
                 <Spinner
@@ -42,22 +42,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|end"
-                    android:popupBackground="@color/colorPrimaryDark"
                     android:gravity="end"
+                    android:popupBackground="@color/colorPrimaryDark"
                     />
             </FrameLayout>
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/movie_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
-
-        <include layout="@layout/view_movie_list"/>
-    </FrameLayout>
+        />
 
 </android.support.design.widget.CoordinatorLayout>
