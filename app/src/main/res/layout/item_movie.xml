@@ -18,10 +18,8 @@
 
     <ImageView
         android:id="@+id/poster"
-        android:transitionName="@string/transition_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/movie_poster"
-        tools:targetApi="lollipop"
         />
 </FrameLayout>

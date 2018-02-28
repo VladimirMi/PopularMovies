@@ -40,22 +40,15 @@
                 <Spinner
                     android:id="@+id/sort_by_spinner"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center_vertical|end"
-                    android:gravity="end"
-                    android:popupBackground="@color/colorPrimaryDark"
+                    android:gravity="center_vertical|end"
                     />
             </FrameLayout>
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/movie_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
+    <include layout="@layout/view_movie_master"/>
 
 </android.support.design.widget.CoordinatorLayout>

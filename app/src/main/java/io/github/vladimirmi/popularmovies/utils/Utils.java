@@ -2,12 +2,22 @@ package io.github.vladimirmi.popularmovies.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.v4.widget.NestedScrollView;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Created by Vladimir Mikhalev 22.02.2018.
@@ -54,5 +64,28 @@ public class Utils {
                 .getDefaultDisplay()
                 .getMetrics(displayMetrics);
         return displayMetrics;
+    }
+
+    public static String formatDate(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        String formattedDate;
+        try {
+            Date d = format.parse(date);
+            formattedDate = DateFormat.getDateInstance().format(d);
+        } catch (ParseException e) {
+            formattedDate = date;
+        }
+        return formattedDate;
+    }
+
+    public static boolean canScroll(NestedScrollView scrollView) {
+        View child = scrollView.getChildAt(0);
+        if (child != null) {
+            int childHeight = child.getHeight();
+            Timber.e("canScroll: " + childHeight);
+            Timber.e("canScroll: " + scrollView.getHeight());
+            return scrollView.getHeight() < childHeight + scrollView.getPaddingTop() + scrollView.getPaddingBottom();
+        }
+        return false;
     }
 }

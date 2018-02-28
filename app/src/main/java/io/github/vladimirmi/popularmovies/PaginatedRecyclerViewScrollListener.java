@@ -1,6 +1,6 @@
 package io.github.vladimirmi.popularmovies;
 
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
@@ -21,9 +21,9 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
     private int mPreviousItemCount = 0;
     private boolean mLoading = false;
 
-    private GridLayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
 
-    public PaginatedRecyclerViewScrollListener(GridLayoutManager layoutManager) {
+    public PaginatedRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
         mLayoutManager = layoutManager;
         mPreviousItemCount = mLayoutManager.getItemCount();
     }

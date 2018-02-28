@@ -2,7 +2,6 @@ package io.github.vladimirmi.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,10 +17,18 @@ import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import timber.log.Timber;
 
 /**
+ * An activity representing a list of Movies. This activity
+ * has different presentations for handset and tablet-size devices. On
+ * handsets, the activity presents a list of items, which when touched,
+ * lead to a {@link MovieDetailsActivity} representing
+ * item details. On tablets, the activity presents the list of items and
+ * item details side-by-side using two vertical panes.
  * An activity representing a list of Movies.
  */
+
 public class MovieListActivity extends AppCompatActivity {
 
     private MovieAdapter mAdapter;
@@ -30,6 +37,7 @@ public class MovieListActivity extends AppCompatActivity {
     private boolean mSortByChanged = false;
     private PaginatedRecyclerViewScrollListener mPaginatedListener;
     private RecyclerView mRecyclerView;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,8 @@ public class MovieListActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mTwoPane = findViewById(R.id.movie_details_container) != null;
 
         setupSpinner();
         setupRecyclerView();
@@ -50,15 +60,22 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = (itemView, movie) -> {
-        Intent intent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
-        intent.putExtra(MovieDetailActivity.ARG_MOVIE, movie);
+        if (mTwoPane) {
+            Bundle arguments = new Bundle();
+            Timber.e(movie.toString());
+            arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE, movie);
+            arguments.putBoolean(MovieDetailsFragment.ARG_TWO_PANE, true);
+            MovieDetailsFragment fragment = new MovieDetailsFragment();
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_details_container, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(MovieListActivity.this, MovieDetailsActivity.class);
+            intent.putExtra(MovieDetailsFragment.ARG_MOVIE, movie);
 
-        String transitionName = getString(R.string.transition_name);
-        ActivityOptionsCompat options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(MovieListActivity.this,
-                        itemView.findViewById(R.id.poster), transitionName);
-
-        startActivity(intent, options.toBundle());
+            startActivity(intent);
+        }
     };
 
 
@@ -67,7 +84,7 @@ public class MovieListActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = new GridLayoutManager(this, calculateSpanCount());
 
         mRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new MovieAdapter(mOnMovieClickListener);
+        mAdapter = new MovieAdapter(mOnMovieClickListener, mTwoPane);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -83,7 +100,7 @@ public class MovieListActivity extends AppCompatActivity {
     private void setupSpinner() {
         Spinner spinner = findViewById(R.id.sort_by_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_by, R.layout.item_spinner_sort_by);
+                R.array.sort_by, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setSelection(App.getDataManager().getSortBy().ordinal());
@@ -156,6 +173,7 @@ public class MovieListActivity extends AppCompatActivity {
         do {
             spanCount++;
             posterWidthDp = displayMetrics.widthPixels / spanCount;
+            if (mTwoPane) posterWidthDp *= 0.4;
         } while (posterWidthDp >= maxPosterWidth);
 
         return spanCount;

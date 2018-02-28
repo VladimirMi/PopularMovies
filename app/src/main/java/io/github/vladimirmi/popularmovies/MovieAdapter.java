@@ -26,13 +26,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private static final double POSTER_ASPECT_RATIO = 1.5;
 
     private final OnMovieClickListener mListener;
+    private final boolean mTwoPane;
     private List<Movie> mMovies = new ArrayList<>();
 
     private int mPosterWidth = 0;
     private int mPosterHeight = 0;
 
-    MovieAdapter(OnMovieClickListener clickListener) {
+    MovieAdapter(OnMovieClickListener clickListener, boolean twoPane) {
         mListener = clickListener;
+        mTwoPane = twoPane;
     }
 
     public void addData(List<Movie> movies) {
@@ -64,6 +66,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         int spanCount = ((GridLayoutManager) ((RecyclerView) parent).getLayoutManager()).getSpanCount();
         DisplayMetrics displayMetrics = Utils.getDisplayMetrics(parent.getContext());
         mPosterWidth = displayMetrics.widthPixels / spanCount;
+        if (mTwoPane) mPosterWidth *= 0.4;
         mPosterHeight = (int) (mPosterWidth * POSTER_ASPECT_RATIO);
     }
 
