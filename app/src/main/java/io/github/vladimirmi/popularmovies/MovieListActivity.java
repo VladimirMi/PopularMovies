@@ -26,7 +26,6 @@ import timber.log.Timber;
  * lead to a {@link MovieDetailsActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
- * An activity representing a list of Movies.
  */
 
 public class MovieListActivity extends AppCompatActivity {

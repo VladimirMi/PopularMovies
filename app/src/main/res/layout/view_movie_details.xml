@@ -61,7 +61,7 @@
             >
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/title_label"
                 style="@style/CustomTextView.Label"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="4dp"
@@ -72,15 +72,15 @@
             <TextView
                 android:id="@+id/movie_title"
                 style="@style/CustomTextView"
-                android:layout_alignBaseline="@id/title"
-                android:layout_toEndOf="@id/title"
-                android:layout_toRightOf="@id/title"
+                android:layout_alignBaseline="@id/title_label"
+                android:layout_toEndOf="@id/title_label"
+                android:layout_toRightOf="@id/title_label"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 tools:text="Movie title"
                 />
 
             <TextView
-                android:id="@+id/rating_title"
+                android:id="@+id/rating_label"
                 style="@style/CustomTextView.Label"
                 android:layout_below="@id/title"
                 android:layout_marginBottom="16dp"
@@ -93,17 +93,17 @@
                 android:id="@+id/movie_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/rating_title"
-                android:layout_toEndOf="@id/rating_title"
-                android:layout_toRightOf="@id/rating_title"
+                android:layout_alignBaseline="@id/rating_label"
+                android:layout_toEndOf="@id/rating_label"
+                android:layout_toRightOf="@id/rating_label"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 tools:text="8.1"
                 />
 
             <TextView
-                android:id="@+id/release_title"
+                android:id="@+id/release_label"
                 style="@style/CustomTextView.Label"
-                android:layout_below="@id/rating_title"
+                android:layout_below="@id/rating_label"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginRight="4dp"
@@ -113,17 +113,17 @@
             <TextView
                 android:id="@+id/movie_release"
                 style="@style/CustomTextView"
-                android:layout_alignBaseline="@id/release_title"
-                android:layout_toEndOf="@id/release_title"
-                android:layout_toRightOf="@id/release_title"
+                android:layout_alignBaseline="@id/release_label"
+                android:layout_toEndOf="@id/release_label"
+                android:layout_toRightOf="@id/release_label"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 tools:text="2017-12-31"
                 />
 
             <TextView
-                android:id="@+id/overview_title"
+                android:id="@+id/overview_label"
                 style="@style/CustomTextView.Label"
-                android:layout_below="@id/release_title"
+                android:layout_below="@id/release_label"
                 android:layout_marginBottom="4dp"
                 android:text="@string/movie_overview"
                 />
@@ -131,7 +131,7 @@
             <TextView
                 android:id="@+id/movie_overview"
                 style="@style/CustomTextView"
-                android:layout_below="@id/overview_title"
+                android:layout_below="@id/overview_label"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 tools:text="Sunt silvaes prensionem ferox, bi-color devirginatoes. Sunt solemes talem azureus, magnum consiliumes. Ubi est azureus victrix?"
                 />

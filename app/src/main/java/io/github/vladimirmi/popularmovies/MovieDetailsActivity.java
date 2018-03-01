@@ -10,6 +10,7 @@ import android.view.MenuItem;
  * item details are presented side-by-side with a list of items
  * in a {@link MovieListActivity}.
  */
+
 public class MovieDetailsActivity extends AppCompatActivity {
 
     @Override

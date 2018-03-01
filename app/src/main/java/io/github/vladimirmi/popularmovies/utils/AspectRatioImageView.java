@@ -9,6 +9,7 @@ import io.github.vladimirmi.popularmovies.R;
 /**
  * Maintains an aspect ratio based on either width or height. Disabled by default.
  */
+
 public class AspectRatioImageView extends android.support.v7.widget.AppCompatImageView {
 
     // NOTE: These must be kept in sync with the AspectRatioImageView attributes in attrs.xml.

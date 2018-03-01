@@ -19,10 +19,6 @@ import java.util.Locale;
 
 import timber.log.Timber;
 
-/**
- * Created by Vladimir Mikhalev 22.02.2018.
- */
-
 public class Utils {
 
     private static final String BASE_URL = "http://image.tmdb.org/t/p/%s/%s";

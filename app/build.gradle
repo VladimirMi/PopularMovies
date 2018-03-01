@@ -44,9 +44,9 @@ dependencies {
     //Net
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     //Logging
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     implementation 'com.jakewharton.timber:timber:4.6.0'
