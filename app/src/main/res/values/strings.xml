@@ -8,6 +8,8 @@
     <string name="movie_title">Title:</string>
     <string name="movie_trailers">Trailers</string>
     <string name="movie_reviews">Reviews</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
 
     <string-array name="sort_by">
         <item>Most popular</item>

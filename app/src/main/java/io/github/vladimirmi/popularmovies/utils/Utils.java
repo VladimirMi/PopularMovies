@@ -1,10 +1,9 @@
 package io.github.vladimirmi.popularmovies.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.v4.widget.NestedScrollView;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -17,35 +16,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import timber.log.Timber;
-
 public class Utils {
 
-    private static final String BASE_URL = "http://image.tmdb.org/t/p/%s/%s";
-
-    public enum PosterQuality {
-        ORIGINAL("original"),
-        VERY_HIGH("w780"),
-        HIGH("w500"),
-        MID("w342"),
-        LOW("w154"),
-        VERY_LOW("w92");
-
-        final String path;
-
-        PosterQuality(String path) {
-            this.path = path;
-        }
-    }
-
-    @SuppressLint("DefaultLocale")
-    private static String getImagePath(PosterQuality quality, String path) {
-        return String.format(BASE_URL, quality.path, path);
-    }
-
-    public static void setImage(ImageView view, String path, PosterQuality quality) {
+    public static void setImage(ImageView view, String path) {
         Glide.with(view.getContext())
-                .load(getImagePath(quality, path))
+                .load(path)
                 .centerCrop()
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
@@ -74,14 +49,14 @@ public class Utils {
         return formattedDate;
     }
 
-    public static boolean canScroll(NestedScrollView scrollView) {
-        View child = scrollView.getChildAt(0);
-        if (child != null) {
-            int childHeight = child.getHeight();
-            Timber.e("canScroll: " + childHeight);
-            Timber.e("canScroll: " + scrollView.getHeight());
-            return scrollView.getHeight() < childHeight + scrollView.getPaddingTop() + scrollView.getPaddingBottom();
-        }
-        return false;
+    public static void runAfterMeasure(View view, Runnable runnable) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        runnable.run();
+                        view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                });
     }
 }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
+import io.github.vladimirmi.popularmovies.data.net.Api;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 
 /**
@@ -96,7 +97,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void bind(Movie movie) {
             mMovie = movie;
             mTitleView.setText(movie.getTitle());
-            Utils.setImage(mPosterView, movie.getPosterPath(), Utils.PosterQuality.LOW);
+            Utils.setImage(mPosterView, movie.getPosterUrl(Api.PosterSize.LOW));
         }
 
         @Override

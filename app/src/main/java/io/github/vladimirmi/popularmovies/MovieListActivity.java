@@ -12,7 +12,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
+import java.util.List;
+
+import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -134,10 +136,10 @@ public class MovieListActivity extends AppCompatActivity {
         mCompDisp.clear();
         mCompDisp.add(App.getDataManager().getPopularMovies(page)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SimpleSingleObserver<PaginatedMoviesResult>() {
+                .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
-                    public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
-                        setData(paginatedMoviesResult);
+                    public void onSuccess(List<Movie> movies) {
+                        setData(movies);
                     }
                 }));
     }
@@ -146,21 +148,21 @@ public class MovieListActivity extends AppCompatActivity {
         mCompDisp.clear();
         mCompDisp.add(App.getDataManager().getTopRatedMovies(page)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SimpleSingleObserver<PaginatedMoviesResult>() {
+                .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
-                    public void onSuccess(PaginatedMoviesResult paginatedMoviesResult) {
-                        setData(paginatedMoviesResult);
+                    public void onSuccess(List<Movie> movies) {
+                        setData(movies);
                     }
                 }));
     }
 
-    private void setData(PaginatedMoviesResult paginatedMoviesResult) {
+    private void setData(List<Movie> movies) {
         if (mSortByChanged) {
             mRecyclerView.scrollToPosition(0);
             mAdapter.resetData();
             mSortByChanged = false;
         }
-        mAdapter.addData(paginatedMoviesResult.getResults());
+        mAdapter.addData(movies);
     }
 
     private int calculateSpanCount() {

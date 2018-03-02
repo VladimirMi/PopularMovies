@@ -23,9 +23,9 @@ public class Preference<T> {
 
     @SuppressWarnings("unchecked")
     public T get() {
-        PrefType type;
+        PreferenceType type;
         try {
-            type = PrefType.valueOf(defaultValue.getClass().getSimpleName());
+            type = PreferenceType.valueOf(defaultValue.getClass().getSimpleName());
         } catch (IllegalArgumentException e) {
             Timber.e("Can not find type %s", defaultValue.getClass().getSimpleName());
             return defaultValue;
@@ -47,9 +47,9 @@ public class Preference<T> {
     }
 
     public void put(T value) {
-        PrefType type;
+        PreferenceType type;
         try {
-            type = PrefType.valueOf(defaultValue.getClass().getSimpleName());
+            type = PreferenceType.valueOf(defaultValue.getClass().getSimpleName());
         } catch (IllegalArgumentException e) {
             Timber.e("Can not find type %s", defaultValue.getClass().getSimpleName());
             return;
@@ -74,9 +74,5 @@ public class Preference<T> {
                 break;
         }
         editor.apply();
-    }
-
-    enum PrefType {
-        Boolean, String, Float, Integer, Long
     }
 }

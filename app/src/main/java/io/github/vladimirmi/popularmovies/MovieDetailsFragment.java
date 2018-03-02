@@ -1,24 +1,34 @@
 package io.github.vladimirmi.popularmovies;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
+import io.github.vladimirmi.popularmovies.data.entity.Review;
+import io.github.vladimirmi.popularmovies.data.entity.Video;
+import io.github.vladimirmi.popularmovies.data.net.Api;
+import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.github.vladimirmi.popularmovies.utils.Utils;
-import timber.log.Timber;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -34,6 +44,7 @@ public class MovieDetailsFragment extends Fragment {
     public static final String ARG_TWO_PANE = "two_pane_key";
     private Movie mMovie;
     private boolean mTwoPane;
+    private ReviewsAdapter mReviewsAdapter;
 
     public MovieDetailsFragment() {
     }
@@ -54,7 +65,7 @@ public class MovieDetailsFragment extends Fragment {
         if (mMovie == null) return rootView;
 
         ImageView poster = rootView.findViewById(R.id.poster);
-        Utils.setImage(poster, mMovie.getBackdropPath(), Utils.PosterQuality.HIGH);
+        Utils.setImage(poster, mMovie.getBackdropUrl(Api.BackdropSize.MID));
 
         TextView titleTv = rootView.findViewById(R.id.movie_title);
         titleTv.setText(mMovie.getTitle());
@@ -73,21 +84,16 @@ public class MovieDetailsFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        setupToolbar(view);
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                setupScrolling(view);
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
+        setupToolbar();
+        setupTrailers();
+        setupReviews();
     }
 
-    private void setupToolbar(View view) {
+    private void setupToolbar() {
         if (mTwoPane) {
-            view.findViewById(R.id.toolbar).setVisibility(View.GONE);
+            getView().findViewById(R.id.toolbar).setVisibility(View.GONE);
         } else {
-            Toolbar toolbar = view.findViewById(R.id.toolbar);
+            Toolbar toolbar = getView().findViewById(R.id.toolbar);
             toolbar.setTitle(mMovie.getTitle());
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
@@ -99,21 +105,75 @@ public class MovieDetailsFragment extends Fragment {
         }
     }
 
-    private void setupScrolling(View view) {
-        NestedScrollView scroll = view.findViewById(R.id.movie_details_scroll);
-        CollapsingToolbarLayout collapsing = view.findViewById(R.id.toolbar_layout);
+    private void setupTrailers() {
+        App.getDataManager().getTrailers(String.valueOf(mMovie.getId()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new SimpleSingleObserver<List<Video>>() {
+                    @Override
+                    public void onSuccess(List<Video> videos) {
+                        if (videos.isEmpty()) {
+                            getView().findViewById(R.id.trailers_label).setVisibility(View.GONE);
+                            return;
+                        }
+                        LinearLayout trailersContainer = getView().findViewById(R.id.movie_trailers);
 
-        boolean canScroll = Utils.canScroll(scroll);
-        Timber.e("onViewCreated: " + canScroll);
-        int scrollFlags = 0;
-        if (canScroll) {
-            scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
-                    AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED;
-        }
-        AppBarLayout.LayoutParams lp = (AppBarLayout.LayoutParams) collapsing.getLayoutParams();
-        lp.setScrollFlags(scrollFlags);
-        collapsing.setLayoutParams(lp);
+                        LayoutInflater inflater = getActivity().getLayoutInflater();
+                        for (Video video : videos) {
+                            View thumbContainer = inflater.inflate(R.layout.view_video_thumbnail, trailersContainer, false);
+                            ImageView thumb = thumbContainer.findViewById(R.id.thumb);
+                            Utils.setImage(thumb, video.getThumbnailUrl());
+                            trailersContainer.addView(thumbContainer);
+                            thumb.setOnClickListener(v -> playOnYouTube(video.getKey(), video.getUrl()));
+                        }
+
+                        //todo if can scroll don't
+                        HorizontalScrollView.LayoutParams lp = (HorizontalScrollView.LayoutParams) trailersContainer.getLayoutParams();
+                        lp.gravity = Gravity.CENTER;
+                        trailersContainer.setGravity(Gravity.CENTER);
+                        trailersContainer.setLayoutParams(lp);
+                    }
+                });
     }
 
+    private void playOnYouTube(String key, String url) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        try {
+            getActivity().startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            getActivity().startActivity(webIntent);
+        }
+    }
 
+    private void setupReviews() {
+        RecyclerView reviewsRecycler = getView().findViewById(R.id.movie_reviews);
+
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        reviewsRecycler.setLayoutManager(lm);
+        mReviewsAdapter = new ReviewsAdapter();
+        reviewsRecycler.setAdapter(mReviewsAdapter);
+        reviewsRecycler.setNestedScrollingEnabled(false);
+        reviewsRecycler.addOnScrollListener(new PaginatedRecyclerViewScrollListener(lm) {
+            @Override
+            public void onLoadMore(int page) {
+                fetchReviews(page);
+            }
+        });
+        fetchReviews(1);
+    }
+
+    private void fetchReviews(int page) {
+        App.getDataManager().getReviwes(String.valueOf(mMovie.getId()), page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new SimpleSingleObserver<List<Review>>() {
+                    @Override
+                    public void onSuccess(List<Review> reviews) {
+                        if (reviews.isEmpty()) {
+                            getView().findViewById(R.id.reviews_label).setVisibility(View.GONE);
+                        } else {
+                            mReviewsAdapter.addData(reviews);
+                        }
+                    }
+                });
+    }
 }

@@ -17,9 +17,9 @@
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleTextAppearance="@style/ExpandedTextAppearance"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar"
             >
 
@@ -57,35 +57,25 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
             >
-
-            <TextView
-                android:id="@+id/title_label"
-                style="@style/CustomTextView.Label"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginRight="4dp"
-                android:text="@string/movie_title"
-                />
 
             <TextView
                 android:id="@+id/movie_title"
                 style="@style/CustomTextView"
-                android:layout_alignBaseline="@id/title_label"
-                android:layout_toEndOf="@id/title_label"
-                android:layout_toRightOf="@id/title_label"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_margin="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 tools:text="Movie title"
                 />
 
             <TextView
                 android:id="@+id/rating_label"
                 style="@style/CustomTextView.Label"
-                android:layout_below="@id/title"
+                android:layout_below="@id/movie_title"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="4dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginRight="4dp"
+                android:layout_marginStart="16dp"
                 android:text="@string/movie_rating"
                 />
 
@@ -106,7 +96,9 @@
                 android:layout_below="@id/rating_label"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="4dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginRight="4dp"
+                android:layout_marginStart="16dp"
                 android:text="@string/movie_release"
                 />
 
@@ -125,6 +117,8 @@
                 style="@style/CustomTextView.Label"
                 android:layout_below="@id/release_label"
                 android:layout_marginBottom="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
                 android:text="@string/movie_overview"
                 />
 
@@ -132,10 +126,19 @@
                 android:id="@+id/movie_overview"
                 style="@style/CustomTextView"
                 android:layout_below="@id/overview_label"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 tools:text="Sunt silvaes prensionem ferox, bi-color devirginatoes. Sunt solemes talem azureus, magnum consiliumes. Ubi est azureus victrix?"
                 />
 
+            <include
+                layout="@layout/view_movie_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/movie_overview"
+                />
         </RelativeLayout>
     </android.support.v4.widget.NestedScrollView>
 
