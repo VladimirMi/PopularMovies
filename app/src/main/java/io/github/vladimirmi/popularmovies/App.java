@@ -4,18 +4,17 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 
-import io.github.vladimirmi.popularmovies.data.DataManager;
-import io.github.vladimirmi.popularmovies.data.net.RestServiceProvider;
-import io.github.vladimirmi.popularmovies.data.preferences.PreferencesManager;
+import io.github.vladimirmi.popularmovies.di.AppModule;
+import io.github.vladimirmi.popularmovies.di.Scopes;
 import timber.log.Timber;
+import toothpick.Toothpick;
+import toothpick.configuration.Configuration;
 
 /**
  * Class for maintaining global application state.
  */
 
 public class App extends Application {
-
-    private static DataManager sDataManager;
 
     @Override
     public void onCreate() {
@@ -27,11 +26,8 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        sDataManager = new DataManager(RestServiceProvider.getService(),
-                new PreferencesManager(getApplicationContext()));
-    }
+        Toothpick.setConfiguration(Configuration.forDevelopment().preventMultipleRootScopes());
 
-    public static DataManager getDataManager() {
-        return sDataManager;
+        Scopes.getAppScope().installModules(new AppModule(this));
     }
 }

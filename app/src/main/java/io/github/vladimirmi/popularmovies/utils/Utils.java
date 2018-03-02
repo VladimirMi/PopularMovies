@@ -3,6 +3,7 @@ package io.github.vladimirmi.popularmovies.utils;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -47,6 +48,17 @@ public class Utils {
             formattedDate = date;
         }
         return formattedDate;
+    }
+
+    public static boolean canScrollHorizontal(ViewGroup viewGroup) {
+        View child = viewGroup.getChildAt(0);
+
+        if (child != null) {
+            int childWidth = child.getWidth();
+            return viewGroup.getWidth() < childWidth + viewGroup.getPaddingLeft()
+                    + viewGroup.getPaddingRight();
+        }
+        return false;
     }
 
     public static void runAfterMeasure(View view, Runnable runnable) {

@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.movielist;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.net.Api;
 import io.github.vladimirmi.popularmovies.utils.Utils;
@@ -38,9 +39,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         mTwoPane = twoPane;
     }
 
-    public void addData(List<Movie> movies) {
+    public void setData(List<Movie> movies) {
         int oldSize = mMovies.size();
-        mMovies.addAll(movies);
+        mMovies = movies;
         notifyItemRangeChanged(oldSize, movies.size());
     }
 

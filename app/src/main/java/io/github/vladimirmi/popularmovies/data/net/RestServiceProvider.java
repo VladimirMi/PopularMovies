@@ -17,22 +17,16 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
- * Provider for {@link RestService}, witch is a singleton.
+ * Provider for {@link RestService}.
  */
 
 public class RestServiceProvider {
-
-    private static class ServiceHolder {
-
-        private static final RestService instance = createRetrofit(createClient())
-                .create(RestService.class);
-    }
 
     private RestServiceProvider() {
     }
 
     public static RestService getService() {
-        return ServiceHolder.instance;
+        return createRetrofit(createClient()).create(RestService.class);
     }
 
     private static OkHttpClient createClient() {

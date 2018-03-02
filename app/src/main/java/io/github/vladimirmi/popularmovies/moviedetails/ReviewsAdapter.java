@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.moviedetails;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 
@@ -24,21 +25,16 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     private List<Review> mReviews = new ArrayList<>();
     private int mExpandedPosition = -1;
 
-    public void addData(List<Review> movies) {
+    public void setData(List<Review> reviews) {
         int oldSize = mReviews.size();
-        mReviews.addAll(movies);
-        notifyItemRangeChanged(oldSize, movies.size());
-    }
-
-    public void resetData() {
-        mReviews = new ArrayList<>();
-        notifyDataSetChanged();
+        mReviews = reviews;
+        notifyItemRangeChanged(oldSize, reviews.size());
     }
 
     @Override
     public ReviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.view_review, parent, false);
+                .inflate(R.layout.item_review, parent, false);
         return new ReviewViewHolder(view);
     }
 

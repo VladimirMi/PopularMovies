@@ -2,7 +2,6 @@ package io.github.vladimirmi.popularmovies.data;
 
 import java.util.List;
 
-import io.github.vladimirmi.popularmovies.MovieListActivity;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedMoviesResult;
 import io.github.vladimirmi.popularmovies.data.entity.PaginatedReviewsResult;
@@ -11,6 +10,7 @@ import io.github.vladimirmi.popularmovies.data.entity.Video;
 import io.github.vladimirmi.popularmovies.data.entity.VideosResult;
 import io.github.vladimirmi.popularmovies.data.net.RestService;
 import io.github.vladimirmi.popularmovies.data.preferences.PreferencesManager;
+import io.github.vladimirmi.popularmovies.movielist.MovieListPresenter;
 import io.reactivex.Single;
 
 /**
@@ -53,12 +53,12 @@ public class DataManager {
 
     //region =============== Shared Preferences ==============
 
-    public void saveSortBy(MovieListActivity.Sort sortBy) {
+    public void saveSortBy(MovieListPresenter.Sort sortBy) {
         mPreferencesManager.sortByOrderPref.put(sortBy.name());
     }
 
-    public MovieListActivity.Sort getSortBy() {
-        return MovieListActivity.Sort.valueOf(mPreferencesManager.sortByOrderPref.get());
+    public MovieListPresenter.Sort getSortBy() {
+        return MovieListPresenter.Sort.valueOf(mPreferencesManager.sortByOrderPref.get());
     }
 
     //endregion

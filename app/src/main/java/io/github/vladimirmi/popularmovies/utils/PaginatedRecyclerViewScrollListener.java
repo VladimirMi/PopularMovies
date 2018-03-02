@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.utils;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,27 +11,26 @@ import android.support.v7.widget.RecyclerView;
  * Default page size is 20.
  */
 
-@SuppressWarnings("WeakerAccess")
-abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+public abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
     private static final int PAGE_SIZE = 20;
     private static final int THRESHOLD = PAGE_SIZE / 2;
 
     private int mLoadedPages = 0;
     private int mPreviousItemCount = 0;
-    private boolean mLoading = false;
+    private boolean mLoading = true;
 
     private LinearLayoutManager mLayoutManager;
 
     public PaginatedRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
         mLayoutManager = layoutManager;
-        mPreviousItemCount = mLayoutManager.getItemCount();
     }
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         int itemCount = mLayoutManager.getItemCount();
         int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
+        mLoadedPages = itemCount / PAGE_SIZE + (itemCount % PAGE_SIZE == 0 ? 0 : 1);
 
         if (mLoading && itemCount > mPreviousItemCount) {
             mLoading = false;
@@ -39,19 +38,15 @@ abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScroll
         }
 
         if (!mLoading && lastVisibleItemPosition + THRESHOLD > PAGE_SIZE * mLoadedPages) {
-            loadMore();
+            mLoading = true;
+            onLoadMore(++mLoadedPages);
         }
-    }
-
-    public void loadMore() {
-        mLoading = true;
-        onLoadMore(++mLoadedPages);
     }
 
     public void reset() {
         mLoadedPages = 0;
         mPreviousItemCount = 0;
-        mLoading = false;
+        mLoading = true;
     }
 
     /**

@@ -134,7 +134,7 @@
                 />
 
             <include
-                layout="@layout/view_movie_reviews"
+                layout="@layout/view_trailers_reviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/movie_overview"

@@ -1,8 +1,11 @@
-package io.github.vladimirmi.popularmovies;
+package io.github.vladimirmi.popularmovies.moviedetails;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+
+import io.github.vladimirmi.popularmovies.R;
+import io.github.vladimirmi.popularmovies.data.entity.Movie;
+import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
 
 /**
  * An activity representing a single Movie detail screen. This
@@ -13,29 +16,21 @@ import android.view.MenuItem;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
         if (savedInstanceState == null) {
+            Movie movie = getIntent().getParcelableExtra(MovieDetailsFragment.ARG_MOVIE);
             Bundle arguments = new Bundle();
-            arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE,
-                    getIntent().getParcelableExtra(MovieDetailsFragment.ARG_MOVIE));
+            arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE, movie);
             MovieDetailsFragment fragment = new MovieDetailsFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.movie_details_container, fragment)
                     .commit();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
