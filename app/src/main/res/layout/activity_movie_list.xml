@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="io.github.vladimirmi.popularmovies.movielist.MovieListActivity"
+    tools:context=".presentation.movielist.view.MovieListActivity"
     >
 
     <android.support.design.widget.AppBarLayout

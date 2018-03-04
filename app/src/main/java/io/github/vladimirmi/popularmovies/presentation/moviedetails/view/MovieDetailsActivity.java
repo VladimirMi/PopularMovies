@@ -1,11 +1,11 @@
-package io.github.vladimirmi.popularmovies.moviedetails;
+package io.github.vladimirmi.popularmovies.presentation.moviedetails.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
-import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
+import io.github.vladimirmi.popularmovies.presentation.movielist.view.MovieListActivity;
 
 /**
  * An activity representing a single Movie detail screen. This

@@ -12,6 +12,12 @@ public class Review {
     @Json(name = "author") private String author;
     @Json(name = "content") private String content;
 
+    public Review(String id, String author, String content) {
+        this.id = id;
+        this.author = author;
+        this.content = content;
+    }
+
     public String getId() {
         return id;
     }

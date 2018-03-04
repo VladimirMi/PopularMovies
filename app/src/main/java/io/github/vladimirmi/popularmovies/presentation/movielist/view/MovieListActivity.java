@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies.movielist;
+package io.github.vladimirmi.popularmovies.presentation.movielist.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,14 +16,15 @@ import java.util.List;
 
 import butterknife.BindView;
 import io.github.vladimirmi.popularmovies.R;
-import io.github.vladimirmi.popularmovies.core.BaseActivity;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.di.Scopes;
-import io.github.vladimirmi.popularmovies.moviedetails.MovieDetailsActivity;
-import io.github.vladimirmi.popularmovies.moviedetails.MovieDetailsFragment;
+import io.github.vladimirmi.popularmovies.presentation.core.BaseActivity;
+import io.github.vladimirmi.popularmovies.presentation.moviedetails.view.MovieDetailsActivity;
+import io.github.vladimirmi.popularmovies.presentation.moviedetails.view.MovieDetailsFragment;
+import io.github.vladimirmi.popularmovies.presentation.movielist.MovieListPresenter;
+import io.github.vladimirmi.popularmovies.presentation.movielist.MovieListView;
 import io.github.vladimirmi.popularmovies.utils.PaginatedRecyclerViewScrollListener;
 import io.github.vladimirmi.popularmovies.utils.Utils;
-import timber.log.Timber;
 
 /**
  * An activity representing a list of Movies. This activity
@@ -48,17 +49,10 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     private boolean mIsSortChanged = false;
     private PaginatedRecyclerViewScrollListener mPaginatedListener;
 
-    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = (itemView, movie) -> {
+    private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = (movie) -> {
+        mPresenter.setLastSelectedMovie(movie);
         if (mTwoPane) {
-            Bundle arguments = new Bundle();
-            Timber.e(movie.toString());
-            arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE, movie);
-            arguments.putBoolean(MovieDetailsFragment.ARG_TWO_PANE, true);
-            MovieDetailsFragment fragment = new MovieDetailsFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_details_container, fragment)
-                    .commit();
+            addFragment(movie);
         } else {
             Intent intent = new Intent(MovieListActivity.this, MovieDetailsActivity.class);
             intent.putExtra(MovieDetailsFragment.ARG_MOVIE, movie);
@@ -125,6 +119,14 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
             mIsSortChanged = false;
         }
         mMovieAdapter.setData(movies);
+
+    }
+
+    @Override
+    public void setSelected(Movie selected) {
+        if (mTwoPane) {
+            addFragment(selected);
+        }
     }
 
     @Override
@@ -138,6 +140,17 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     public void resetMoviesList() {
         mPaginatedListener.reset();
         mIsSortChanged = true;
+    }
+
+    private void addFragment(Movie movie) {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE, movie);
+        arguments.putBoolean(MovieDetailsFragment.ARG_TWO_PANE, true);
+        MovieDetailsFragment fragment = new MovieDetailsFragment();
+        fragment.setArguments(arguments);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.movie_details_container, fragment)
+                .commit();
     }
 
     private int calculateSpanCount() {

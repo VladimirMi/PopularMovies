@@ -10,6 +10,9 @@ import timber.log.Timber;
 import toothpick.Toothpick;
 import toothpick.configuration.Configuration;
 
+import static toothpick.registries.FactoryRegistryLocator.setRootRegistry;
+import static toothpick.registries.MemberInjectorRegistryLocator.setRootRegistry;
+
 /**
  * Class for maintaining global application state.
  */
@@ -26,7 +29,13 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        Toothpick.setConfiguration(Configuration.forDevelopment().preventMultipleRootScopes());
+        if (BuildConfig.DEBUG) {
+            Toothpick.setConfiguration(Configuration.forDevelopment().preventMultipleRootScopes());
+        } else {
+            Toothpick.setConfiguration(Configuration.forProduction().disableReflection());
+            setRootRegistry(new FactoryRegistry());
+            setRootRegistry(new MemberInjectorRegistry());
+        }
 
         Scopes.getAppScope().installModules(new AppModule(this));
     }

@@ -22,6 +22,16 @@ public class Movie implements Parcelable {
     @Json(name = "overview") private String overview;
     @Json(name = "release_date") private String releaseDate;
 
+    public Movie(int id, double voteAverage, String title, String posterPath, String backdropPath, String overview, String releaseDate) {
+        this.id = id;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+    }
+
     protected Movie(Parcel in) {
         id = in.readInt();
         voteAverage = in.readDouble();
@@ -86,6 +96,14 @@ public class Movie implements Parcelable {
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public String getBackdropPath() {
+        return backdropPath;
     }
 
     @SuppressLint("DefaultLocale")

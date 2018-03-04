@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies.movielist;
+package io.github.vladimirmi.popularmovies.presentation.movielist.view;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,6 +48,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void resetData() {
         mMovies = new ArrayList<>();
         notifyDataSetChanged();
+    }
+
+    public int getPosition(Movie movie) {
+        return mMovies.indexOf(movie);
     }
 
     @Override
@@ -103,12 +107,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         @Override
         public void onClick(View v) {
-            mListener.onMovieClick(itemView, mMovie);
+            mListener.onMovieClick(mMovie);
         }
     }
 
     interface OnMovieClickListener {
 
-        void onMovieClick(View itemView, Movie movie);
+        void onMovieClick(Movie movie);
     }
 }

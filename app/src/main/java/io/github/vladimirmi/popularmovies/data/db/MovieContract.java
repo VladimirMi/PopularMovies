@@ -17,6 +17,7 @@ public final class MovieContract {
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_POSTER = "posterPath";
         public static final String COLUMN_BACKDROP = "backdropPath";
+        public static final String COLUMN_TIMESTAMP = "createdAt";
     }
 
     public static class ReviewEntry implements BaseColumns {

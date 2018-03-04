@@ -1,8 +1,12 @@
-package io.github.vladimirmi.popularmovies.moviedetails;
+package io.github.vladimirmi.popularmovies.presentation.moviedetails.view;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +14,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -20,14 +27,17 @@ import java.util.List;
 
 import butterknife.BindView;
 import io.github.vladimirmi.popularmovies.R;
-import io.github.vladimirmi.popularmovies.core.BaseFragment;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.data.entity.Video;
 import io.github.vladimirmi.popularmovies.data.net.Api;
 import io.github.vladimirmi.popularmovies.di.Scopes;
-import io.github.vladimirmi.popularmovies.movielist.MovieListActivity;
+import io.github.vladimirmi.popularmovies.presentation.core.BaseFragment;
+import io.github.vladimirmi.popularmovies.presentation.moviedetails.MovieDetailsPresenter;
+import io.github.vladimirmi.popularmovies.presentation.moviedetails.MovieDetailsView;
+import io.github.vladimirmi.popularmovies.presentation.movielist.view.MovieListActivity;
 import io.github.vladimirmi.popularmovies.utils.AspectRatioImageView;
+import io.github.vladimirmi.popularmovies.utils.FabVisibleListener;
 import io.github.vladimirmi.popularmovies.utils.PaginatedRecyclerViewScrollListener;
 import io.github.vladimirmi.popularmovies.utils.Utils;
 import toothpick.Scope;
@@ -48,6 +58,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     public static final String ARG_MOVIE = "movie_key";
     public static final String ARG_TWO_PANE = "two_pane_key";
 
+    @BindView(R.id.app_bar) AppBarLayout mAppbar;
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.poster) AspectRatioImageView mPoster;
     @BindView(R.id.movie_title) TextView mTitle;
@@ -59,10 +70,13 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     @BindView(R.id.reviews_label) TextView mReviewsLabel;
     @BindView(R.id.movie_reviews) RecyclerView mReviews;
     @BindView(R.id.trailers_scroll) HorizontalScrollView mTrailersScroll;
+    @BindView(R.id.like_btn) FloatingActionButton mLikeBtn;
 
     private boolean mTwoPane;
     private ReviewsAdapter mReviewsAdapter;
     private int mScopeName;
+    private boolean mIsFabVisible;
+    private boolean mIsFavorite;
 
     public MovieDetailsFragment() {
     }
@@ -76,7 +90,6 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     protected MovieDetailsPresenter providePresenter() {
         mTwoPane = getArguments().containsKey(ARG_TWO_PANE);
         Movie movie = getArguments().getParcelable(ARG_MOVIE);
-        assert movie != null;
         mScopeName = movie.getId();
         Scope scope = Toothpick.openScopes(Scopes.APP_SCOPE, mScopeName);
         scope.installModules(new Module() {{
@@ -88,11 +101,42 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        boolean ensureFragment = getActivity().findViewById(R.id.movie_details_container) != null;
+        setHasOptionsMenu(ensureFragment);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         if (getActivity().isFinishing()) {
             Toothpick.closeScope(mScopeName);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (!mIsFabVisible) {
+            if (mIsFavorite) {
+                inflater.inflate(R.menu.favorite_menu, menu);
+            } else {
+                inflater.inflate(R.menu.not_favorite_menu, menu);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_favorite:
+                mPresenter.switchFavorite();
+                return true;
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -108,6 +152,16 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
                 mPresenter.loadMoreReviews(page);
             }
         });
+
+        mLikeBtn.setOnClickListener(v -> mPresenter.switchFavorite());
+
+        mAppbar.addOnOffsetChangedListener(new FabVisibleListener() {
+            @Override
+            public void onVisibleChanged(boolean isVisible) {
+                mIsFabVisible = isVisible;
+                getActivity().invalidateOptionsMenu();
+            }
+        });
     }
 
     @Override
@@ -118,6 +172,17 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
         mRelease.setText(Utils.formatDate(movie.getReleaseDate()));
         mOverview.setText(movie.getOverview());
         setupToolbar(movie);
+    }
+
+    @Override
+    public void setIsFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
+        getActivity().invalidateOptionsMenu();
+        if (isFavorite) {
+            mLikeBtn.setImageResource(R.drawable.ic_favorite);
+        } else {
+            mLikeBtn.setImageResource(R.drawable.ic_not_favorite);
+        }
     }
 
     @Override

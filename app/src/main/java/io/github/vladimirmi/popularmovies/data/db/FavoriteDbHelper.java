@@ -22,16 +22,17 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
             MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL," +
             MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL," +
             MovieEntry.COLUMN_POSTER + " TEXT NOT NULL," +
-            MovieEntry.COLUMN_BACKDROP + " TEXT NOT NULL)";
+            MovieEntry.COLUMN_BACKDROP + " TEXT NOT NULL," +
+            MovieEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
-    public static final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " +
+    private static final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " +
             VideoEntry.TABLE_NAME + " (" +
             VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             VideoEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
             VideoEntry.COLUMN_NAME + " TEXT NOT NULL," +
             VideoEntry.COLUMN_KEY + " TEXT NOT NULL)";
 
-    public static final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " +
+    private static final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " +
             ReviewEntry.TABLE_NAME + " (" +
             ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             ReviewEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +

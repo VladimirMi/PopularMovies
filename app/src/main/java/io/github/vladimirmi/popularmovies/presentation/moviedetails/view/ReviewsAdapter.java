@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies.moviedetails;
+package io.github.vladimirmi.popularmovies.presentation.moviedetails.view;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +19,6 @@ import io.github.vladimirmi.popularmovies.utils.Utils;
  * within a {@link RecyclerView}.
  */
 
-@SuppressWarnings("WeakerAccess")
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewViewHolder> {
 
     private List<Review> mReviews = new ArrayList<>();

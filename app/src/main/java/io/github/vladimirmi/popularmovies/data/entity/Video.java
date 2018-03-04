@@ -16,6 +16,12 @@ public class Video {
     @Json(name = "key") private String key;
     @Json(name = "name") private String name;
 
+    public Video(String id, String key, String name) {
+        this.id = id;
+        this.key = key;
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }

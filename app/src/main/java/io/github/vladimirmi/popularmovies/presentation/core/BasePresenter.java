@@ -1,4 +1,4 @@
-package io.github.vladimirmi.popularmovies.core;
+package io.github.vladimirmi.popularmovies.presentation.core;
 
 import io.reactivex.disposables.CompositeDisposable;
 
