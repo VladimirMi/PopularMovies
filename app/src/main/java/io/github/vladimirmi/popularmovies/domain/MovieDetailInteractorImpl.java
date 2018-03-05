@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.data.entity.Video;
-import io.github.vladimirmi.popularmovies.data.net.NetworkChecker;
 import io.github.vladimirmi.popularmovies.presentation.moviedetails.MovieDetailInteractor;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -19,30 +18,42 @@ import io.reactivex.Single;
 public class MovieDetailInteractorImpl implements MovieDetailInteractor {
 
     private final DataRepository mRepository;
-    private final NetworkChecker mChecker;
 
     @Inject
-    public MovieDetailInteractorImpl(DataRepository repository, NetworkChecker checker) {
+    public MovieDetailInteractorImpl(DataRepository repository) {
         mRepository = repository;
-        mChecker = checker;
     }
 
     @Override
     public Single<List<Video>> getTrailers(int movieId) {
-        if (mChecker.isAvailableNet()) {
-            return mRepository.getTrailersFromNet(String.valueOf(movieId));
-        } else {
-            return mRepository.getTrailersFromDb(String.valueOf(movieId));
-        }
+        String id = String.valueOf(movieId);
+        return isFavorite(movieId)
+                .flatMap(favorite -> {
+                    if (favorite) {
+                        return mRepository.getTrailersFromNet(id)
+                                .flatMapCompletable(videos -> mRepository.updateTrailers(videos, id))
+                                .andThen(mRepository.getTrailersFromDb(id))
+                                .onErrorResumeNext(mRepository.getTrailersFromDb(id));
+                    } else {
+                        return mRepository.getTrailersFromNet(id);
+                    }
+                });
     }
 
     @Override
     public Single<List<Review>> getReviews(int movieId, int page) {
-        if (mChecker.isAvailableNet()) {
-            return mRepository.getReviewsFromNet(String.valueOf(movieId), page);
-        } else {
-            return mRepository.getReviewsFromDb(String.valueOf(movieId));
-        }
+        String id = String.valueOf(movieId);
+        return isFavorite(movieId)
+                .flatMap(favorite -> {
+                    if (favorite) {
+                        return mRepository.getReviewsFromNet(id, page)
+                                .flatMapCompletable(videos -> mRepository.updateReviews(videos, id))
+                                .andThen(mRepository.getReviewsFromDb(id))
+                                .onErrorResumeNext(mRepository.getReviewsFromDb(id));
+                    } else {
+                        return mRepository.getReviewsFromNet(id, page);
+                    }
+                });
     }
 
     @Override

@@ -8,6 +8,7 @@ import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Sort;
 import io.github.vladimirmi.popularmovies.data.net.NetworkChecker;
 import io.github.vladimirmi.popularmovies.presentation.movielist.MovieListInteractor;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -36,7 +37,7 @@ public class MovieListIntearactorImpl implements MovieListInteractor {
     }
 
     @Override
-    public Single<List<Movie>> getFavoriteMovies() {
+    public Observable<List<Movie>> getFavoriteMovies() {
         return mRepository.getFavoriteMovies();
     }
 

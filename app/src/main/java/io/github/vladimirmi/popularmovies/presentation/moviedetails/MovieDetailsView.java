@@ -20,4 +20,6 @@ public interface MovieDetailsView extends BaseView {
     void setTrailers(List<Video> videos);
 
     void setReviews(List<Review> reviews);
+
+    void showToast(int stringResId);
 }

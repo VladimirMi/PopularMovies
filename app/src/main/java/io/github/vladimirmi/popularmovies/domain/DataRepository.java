@@ -7,6 +7,7 @@ import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.data.entity.Sort;
 import io.github.vladimirmi.popularmovies.data.entity.Video;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -19,7 +20,7 @@ public interface DataRepository {
 
     Single<List<Movie>> getTopRatedMovies(int page);
 
-    Single<List<Movie>> getFavoriteMovies();
+    Observable<List<Movie>> getFavoriteMovies();
 
     Single<Movie> getFavoriteMovie(String movieId);
 
@@ -38,4 +39,10 @@ public interface DataRepository {
     Completable removeFavorite(String movieId);
 
     Completable addFavorite(Movie movie, List<Review> reviews, List<Video> videos);
+
+    Completable updateMovie(Movie movie);
+
+    Completable updateReviews(List<Review> reviews, String movieId);
+
+    Completable updateTrailers(List<Video> videos, String movieId);
 }

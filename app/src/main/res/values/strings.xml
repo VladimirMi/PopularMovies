@@ -12,6 +12,8 @@
     <string name="collapse">Collapse</string>
     <string name="add_to_favorite">Add to favorite</string>
     <string name="remove_from_favorite">Remove from favorite</string>
+    <string name="toast_favorite_add">Added to favorites</string>
+    <string name="toast_favorite_remove">Removed from favorites</string>
 
     <string-array name="sort_by">
         <item>Most popular</item>

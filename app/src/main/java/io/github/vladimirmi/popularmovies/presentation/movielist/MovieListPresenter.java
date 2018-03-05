@@ -11,6 +11,7 @@ import io.github.vladimirmi.popularmovies.presentation.core.BasePresenter;
 import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 /**
  * Created by Vladimir Mikhalev 02.03.2018.
@@ -20,8 +21,8 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     private MovieListInteractor mInteractor;
     private Sort mSortBy;
-    private List<Movie> mPopularMovies;
-    private List<Movie> mTopMovies;
+    private List<Movie> mPopularMovies = new ArrayList<>();
+    private List<Movie> mTopMovies = new ArrayList<>();
     private Movie mLastSelected;
 
     @Inject
@@ -71,10 +72,10 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private void setMovies() {
         switch (mSortBy) {
             case POPULAR:
-                setOrFetchIfNull(mPopularMovies);
+                setOrFetchIfEmpty(mPopularMovies);
                 break;
             case TOP_RATED:
-                setOrFetchIfNull(mTopMovies);
+                setOrFetchIfEmpty(mTopMovies);
                 break;
             case FAVORITE:
                 fetchMovies(1);
@@ -83,8 +84,8 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
         mView.setSelected(mLastSelected);
     }
 
-    private void setOrFetchIfNull(List<Movie> movies) {
-        if (movies != null) {
+    private void setOrFetchIfEmpty(List<Movie> movies) {
+        if (!movies.isEmpty()) {
             mView.setMovies(movies);
         } else {
             fetchMovies(1);
@@ -97,13 +98,8 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
                 .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
                     public void onSuccess(List<Movie> movies) {
-                        if (mPopularMovies == null) {
-                            mPopularMovies = new ArrayList<>(movies);
-                            mLastSelected = movies.get(0);
-                            mView.setSelected(mLastSelected);
-                        } else {
-                            mPopularMovies.addAll(movies);
-                        }
+                        initLastSelected(movies);
+                        mPopularMovies.addAll(movies);
                         mView.setMovies(mPopularMovies);
                     }
                 });
@@ -115,13 +111,8 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
                 .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
                     public void onSuccess(List<Movie> movies) {
-                        if (mTopMovies == null) {
-                            mTopMovies = new ArrayList<>(movies);
-                            mLastSelected = movies.get(0);
-                            mView.setSelected(mLastSelected);
-                        } else {
-                            mTopMovies.addAll(movies);
-                        }
+                        initLastSelected(movies);
+                        mTopMovies.addAll(movies);
                         mView.setMovies(mTopMovies);
                     }
                 });
@@ -130,19 +121,20 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private Disposable fetchFavoriteMovies() {
         return mInteractor.getFavoriteMovies()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
-                    @Override
-                    public void onSuccess(List<Movie> movies) {
-                        if (mLastSelected == null && !movies.isEmpty()) {
-                            mLastSelected = movies.get(0);
-                            mView.setSelected(mLastSelected);
-                        }
-                        mView.setMovies(movies);
-                    }
-                });
+                .subscribe(movies -> {
+                    initLastSelected(movies);
+                    mView.setMovies(movies);
+                }, Timber::e);
     }
 
     public void setLastSelectedMovie(Movie movie) {
         mLastSelected = movie;
+    }
+
+    private void initLastSelected(List<Movie> movies) {
+        if (mLastSelected == null && !movies.isEmpty()) {
+            mLastSelected = movies.get(0);
+            mView.setSelected(mLastSelected);
+        }
     }
 }

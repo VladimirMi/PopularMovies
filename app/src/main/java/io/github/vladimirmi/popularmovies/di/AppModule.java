@@ -1,9 +1,10 @@
 package io.github.vladimirmi.popularmovies.di;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import io.github.vladimirmi.popularmovies.data.DataManager;
+import io.github.vladimirmi.popularmovies.data.DataRepositoryImpl;
 import io.github.vladimirmi.popularmovies.data.db.FavoriteDbHelper;
 import io.github.vladimirmi.popularmovies.data.net.NetworkChecker;
 import io.github.vladimirmi.popularmovies.data.net.RestService;
@@ -29,8 +30,9 @@ public class AppModule extends Module {
         bind(Preferences.class).toInstance(new Preferences(context));
         bind(NetworkChecker.class).toInstance(new NetworkChecker(context));
         bind(SQLiteDatabase.class).toInstance(new FavoriteDbHelper(context).getWritableDatabase());
+        bind(ContentResolver.class).toInstance(context.getContentResolver());
 
-        bind(DataRepository.class).to(DataManager.class).singletonInScope();
+        bind(DataRepository.class).to(DataRepositoryImpl.class).singletonInScope();
         bind(MovieDetailInteractor.class).to(MovieDetailInteractorImpl.class);
         bind(MovieListInteractor.class).to(MovieListIntearactorImpl.class);
         bind(MovieListPresenter.class).singletonInScope();

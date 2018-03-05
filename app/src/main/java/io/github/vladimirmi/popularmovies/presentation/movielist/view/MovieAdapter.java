@@ -1,5 +1,6 @@
 package io.github.vladimirmi.popularmovies.presentation.movielist.view;
 
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -40,9 +41,30 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     public void setData(List<Movie> movies) {
-        int oldSize = mMovies.size();
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return mMovies.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return movies.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return mMovies.get(oldItemPosition) == movies.get(newItemPosition);
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return true;
+            }
+        });
+
         mMovies = movies;
-        notifyItemRangeChanged(oldSize, movies.size());
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void resetData() {

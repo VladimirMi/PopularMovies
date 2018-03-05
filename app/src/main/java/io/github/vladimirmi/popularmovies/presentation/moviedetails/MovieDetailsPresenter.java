@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.data.entity.Video;
@@ -12,6 +13,7 @@ import io.github.vladimirmi.popularmovies.presentation.core.BasePresenter;
 import io.github.vladimirmi.popularmovies.utils.SimpleSingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 /**
  * Created by Vladimir Mikhalev 02.03.2018.
@@ -22,8 +24,8 @@ public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
     private final MovieDetailInteractor mInteractor;
     private Movie mMovie;
     private boolean mIsFavorite;
-    private List<Video> mVideos;
-    private List<Review> mReviews;
+    private List<Video> mVideos = new ArrayList<>();
+    private List<Review> mReviews = new ArrayList<>();
 
     @Inject
     public MovieDetailsPresenter(MovieDetailInteractor interactor) {
@@ -74,11 +76,7 @@ public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
                 .subscribeWith(new SimpleSingleObserver<List<Review>>() {
                     @Override
                     public void onSuccess(List<Review> reviews) {
-                        if (mReviews == null) {
-                            mReviews = new ArrayList<>(reviews);
-                        } else {
-                            mReviews.addAll(reviews);
-                        }
+                        mReviews.addAll(reviews);
                         mView.setReviews(mReviews);
                     }
                 });
@@ -98,9 +96,15 @@ public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
 
     public void switchFavorite() {
         if (mIsFavorite) {
-            mInteractor.removeFavorite(mMovie.getId()).subscribe();
+            mCompDisp.add(mInteractor.removeFavorite(mMovie.getId())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> mView.showToast(R.string.toast_favorite_remove),
+                            Timber::e));
         } else {
-            mInteractor.addFavorite(mMovie, mReviews, mVideos).subscribe();
+            mCompDisp.add(mInteractor.addFavorite(mMovie, mReviews, mVideos)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> mView.showToast(R.string.toast_favorite_add),
+                            Timber::e));
         }
         mIsFavorite = !mIsFavorite;
         mView.setIsFavorite(mIsFavorite);

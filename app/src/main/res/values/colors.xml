@@ -9,7 +9,8 @@
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#b2ffffff</color>
 
-    <color name="grey_600">#616161</color>
+    <color name="grey_800">#96424242</color>
+    <color name="grey_700">#616161</color>
     <color name="grey_400">#bdbdbd</color>
     <color name="transparent">#00ffffff</color>
 </resources>

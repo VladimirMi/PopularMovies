@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Sort;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -16,7 +17,7 @@ public interface MovieListInteractor {
 
     Single<List<Movie>> getTopRatedMovies(int page);
 
-    Single<List<Movie>> getFavoriteMovies();
+    Observable<List<Movie>> getFavoriteMovies();
 
     void saveSortBy(Sort sortBy);
 

@@ -12,7 +12,7 @@ import io.github.vladimirmi.popularmovies.data.db.MovieContract.VideoEntry;
 public class FavoriteDbHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "favorites.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     private static final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " +
             MovieEntry.TABLE_NAME + " (" +
@@ -29,6 +29,7 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
             VideoEntry.TABLE_NAME + " (" +
             VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             VideoEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
+            VideoEntry.COLUMN_SERVER_ID + " TEXT UNIQUE NOT NULL," +
             VideoEntry.COLUMN_NAME + " TEXT NOT NULL," +
             VideoEntry.COLUMN_KEY + " TEXT NOT NULL)";
 
@@ -36,6 +37,7 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
             ReviewEntry.TABLE_NAME + " (" +
             ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             ReviewEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
+            ReviewEntry.COLUMN_SERVER_ID + " TEXT UNIQUE NOT NULL," +
             ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL," +
             ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL)";
 

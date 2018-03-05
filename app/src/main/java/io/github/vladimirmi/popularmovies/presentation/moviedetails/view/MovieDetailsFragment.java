@@ -1,5 +1,6 @@
 package io.github.vladimirmi.popularmovies.presentation.moviedetails.view;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -103,8 +105,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean ensureFragment = getActivity().findViewById(R.id.movie_details_container) != null;
-        setHasOptionsMenu(ensureFragment);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -164,11 +165,12 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
         });
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void setMovie(Movie movie) {
         Utils.setImage(mPoster, movie.getBackdropUrl(Api.BackdropSize.MID));
         mTitle.setText(movie.getTitle());
-        mRating.setText(String.valueOf(movie.getVoteAverage()));
+        mRating.setText(String.format("%1.1f / 10", movie.getVoteAverage()));
         mRelease.setText(Utils.formatDate(movie.getReleaseDate()));
         mOverview.setText(movie.getOverview());
         setupToolbar(movie);
@@ -187,10 +189,9 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
 
     @Override
     public void setTrailers(List<Video> videos) {
-        if (videos.isEmpty()) {
-            mTrailersLabel.setVisibility(View.GONE);
-            return;
-        }
+        if (videos.isEmpty()) return;
+
+        mTrailersLabel.setVisibility(View.VISIBLE);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mTrailers.removeAllViews();
         for (Video video : videos) {
@@ -213,11 +214,15 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
 
     @Override
     public void setReviews(List<Review> reviews) {
-        if (reviews.isEmpty()) {
-            mReviewsLabel.setVisibility(View.GONE);
-        } else {
+        if (!reviews.isEmpty()) {
+            mReviewsLabel.setVisibility(View.VISIBLE);
             mReviewsAdapter.setData(reviews);
         }
+    }
+
+    @Override
+    public void showToast(int stringResId) {
+        Toast.makeText(getContext(), stringResId, Toast.LENGTH_SHORT).show();
     }
 
     private void setupToolbar(Movie movie) {
