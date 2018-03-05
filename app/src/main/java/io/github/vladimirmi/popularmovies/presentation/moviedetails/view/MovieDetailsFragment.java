@@ -53,6 +53,7 @@ import toothpick.config.Module;
  * on handsets.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, MovieDetailsView>
         implements MovieDetailsView {
 

@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.github.vladimirmi.popularmovies.BuildConfig;
 import io.github.vladimirmi.popularmovies.data.db.MovieContract;
 import io.github.vladimirmi.popularmovies.data.db.ValuesMapper;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
@@ -161,7 +160,7 @@ public class DataRepositoryImpl implements DataRepository {
         ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(reviewUri,
                 reviews, review -> ValuesMapper.createValue(review, movieId));
 
-        return Completable.fromAction(() -> mResolver.applyBatch(BuildConfig.APPLICATION_ID, operations))
+        return Completable.fromAction(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -171,7 +170,7 @@ public class DataRepositoryImpl implements DataRepository {
         ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(videoUri,
                 videos, video -> ValuesMapper.createValue(video, movieId));
 
-        return Completable.fromAction(() -> mResolver.applyBatch(BuildConfig.APPLICATION_ID, operations))
+        return Completable.fromAction(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
                 .subscribeOn(Schedulers.io());
     }
 }

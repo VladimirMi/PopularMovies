@@ -15,6 +15,7 @@ public abstract class BaseActivity<P extends BasePresenter, V extends BaseView> 
 
     protected P mPresenter;
 
+    @SuppressWarnings("SameReturnValue")
     protected abstract int getLayout();
 
     protected abstract P providePresenter();

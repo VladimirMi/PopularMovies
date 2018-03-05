@@ -19,10 +19,10 @@ import timber.log.Timber;
 
 public class MovieListPresenter extends BasePresenter<MovieListView> {
 
-    private MovieListInteractor mInteractor;
+    private final MovieListInteractor mInteractor;
     private Sort mSortBy;
-    private List<Movie> mPopularMovies = new ArrayList<>();
-    private List<Movie> mTopMovies = new ArrayList<>();
+    private final List<Movie> mPopularMovies = new ArrayList<>();
+    private final List<Movie> mTopMovies = new ArrayList<>();
     private Movie mLastSelected;
 
     @Inject

@@ -22,12 +22,12 @@ import timber.log.Timber;
 
 public class MovieContentProvider extends ContentProvider {
 
-    public static final int MOVIES = 100;
-    public static final int MOVIE_FOR_ID = 101;
-    public static final int REVIEWS = 200;
-    public static final int REVIEWS_FOR_MOVIE = 201;
-    public static final int VIDEOS = 300;
-    public static final int VIDEOS_FOR_MOVIE = 301;
+    private static final int MOVIES = 100;
+    private static final int MOVIE_FOR_ID = 101;
+    private static final int REVIEWS = 200;
+    private static final int REVIEWS_FOR_MOVIE = 201;
+    private static final int VIDEOS = 300;
+    private static final int VIDEOS_FOR_MOVIE = 301;
 
     private UriMatcher mMatcher;
     private SQLiteDatabase mDb;
@@ -199,7 +199,7 @@ public class MovieContentProvider extends ContentProvider {
         throw new UnsupportedOperationException();
     }
 
-    public static UriMatcher buildUriMatcher() {
+    private static UriMatcher buildUriMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIES, MOVIES);

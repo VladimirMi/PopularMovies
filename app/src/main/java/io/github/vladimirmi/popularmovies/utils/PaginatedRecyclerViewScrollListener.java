@@ -20,7 +20,7 @@ public abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.O
     private int mPreviousItemCount = 0;
     private boolean mLoading = true;
 
-    private LinearLayoutManager mLayoutManager;
+    private final LinearLayoutManager mLayoutManager;
 
     public PaginatedRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
         mLayoutManager = layoutManager;

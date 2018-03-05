@@ -35,6 +35,7 @@ import io.github.vladimirmi.popularmovies.utils.Utils;
  * item details side-by-side using two vertical panes.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieListView>
         implements MovieListView {
 

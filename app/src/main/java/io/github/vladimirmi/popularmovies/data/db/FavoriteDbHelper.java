@@ -11,8 +11,8 @@ import io.github.vladimirmi.popularmovies.data.db.MovieContract.VideoEntry;
 
 public class FavoriteDbHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "favorites.db";
-    public static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_NAME = "favorites.db";
+    private static final int DATABASE_VERSION = 2;
 
     private static final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " +
             MovieEntry.TABLE_NAME + " (" +

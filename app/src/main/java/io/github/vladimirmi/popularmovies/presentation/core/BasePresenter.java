@@ -10,7 +10,7 @@ public abstract class BasePresenter<V extends BaseView> {
 
     protected boolean isFirstAttach = true;
     protected V mView;
-    protected CompositeDisposable mCompDisp = new CompositeDisposable();
+    protected final CompositeDisposable mCompDisp = new CompositeDisposable();
 
     public final void attachView(V view) {
         this.mView = view;
@@ -33,5 +33,6 @@ public abstract class BasePresenter<V extends BaseView> {
     }
 
     protected void onDetach() {
+        //no-op
     }
 }

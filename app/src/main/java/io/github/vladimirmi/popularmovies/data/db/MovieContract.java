@@ -6,6 +6,7 @@ import android.provider.BaseColumns;
 
 import io.github.vladimirmi.popularmovies.BuildConfig;
 
+@SuppressWarnings("WeakerAccess")
 public final class MovieContract {
 
     private MovieContract() {

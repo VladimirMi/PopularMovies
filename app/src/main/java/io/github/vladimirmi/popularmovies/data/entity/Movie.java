@@ -12,6 +12,7 @@ import io.github.vladimirmi.popularmovies.data.net.Api;
  * Class that represents a Movie model.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class Movie implements Parcelable {
 
     @Json(name = "id") private int id;
