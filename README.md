@@ -8,6 +8,7 @@ To build a project, create a file called ```secrets.properties``` in the project
   ```apiKey=your_api_key(v3 auth)```
 
 ## License
+```
 MIT License
 
 Copyright (c) 2018 Vladimir Mikhalev
@@ -29,3 +30,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
