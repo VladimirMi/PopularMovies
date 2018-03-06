@@ -44,6 +44,7 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     }
 
     public void fetchMovies(int page) {
+        mView.showLoading(true);
         switch (mSortBy) {
             case POPULAR:
                 mCompDisp.clear();

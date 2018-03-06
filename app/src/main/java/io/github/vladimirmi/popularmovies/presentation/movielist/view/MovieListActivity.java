@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     @BindView(R.id.sort_by_spinner) Spinner mSpinner;
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.movie_list) RecyclerView mMovieList;
+    @BindView(R.id.loadingPb) ProgressBar mLoadIndicator;
 
 
     private MovieAdapter mMovieAdapter;
@@ -119,6 +121,7 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
             mMovieAdapter.resetData();
             mIsSortChanged = false;
         }
+        showLoading(false);
         mMovieAdapter.setData(movies);
 
     }
@@ -128,6 +131,11 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
         if (mTwoPane) {
             addFragment(selected);
         }
+    }
+
+    @Override
+    public void showLoading(boolean show) {
+        mLoadIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override

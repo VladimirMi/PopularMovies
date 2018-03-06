@@ -18,4 +18,6 @@ public interface MovieListView extends BaseView {
     void resetMoviesList();
 
     void setSelected(Movie lastSelected);
+
+    void showLoading(boolean show);
 }
