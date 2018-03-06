@@ -21,5 +21,5 @@ public interface MovieDetailsView extends BaseView {
 
     void setReviews(List<Review> reviews);
 
-    void showToast(int stringResId);
+    void showSnack(int stringResId);
 }

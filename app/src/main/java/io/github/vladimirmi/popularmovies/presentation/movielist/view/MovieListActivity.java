@@ -2,6 +2,9 @@ package io.github.vladimirmi.popularmovies.presentation.movielist.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -48,7 +51,8 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
 
 
     private MovieAdapter mMovieAdapter;
-    private boolean mTwoPane;
+    private GridLayoutManager mLayoutManager;
+    private boolean mTwoPane = false;
     private boolean mIsSortChanged = false;
     private PaginatedRecyclerViewScrollListener mPaginatedListener;
 
@@ -67,6 +71,7 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     private final AdapterView.OnItemSelectedListener mOnSortChangeListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            mPresenter.saveScrollState(mLayoutManager.onSaveInstanceState());
             mPresenter.saveSortByPosition(position);
         }
 
@@ -86,6 +91,12 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.saveScrollState(mLayoutManager.onSaveInstanceState());
+    }
+
+    @Override
     protected void setupView() {
         mTwoPane = findViewById(R.id.movie_details_container) != null;
         setSupportActionBar(mToolbar);
@@ -94,11 +105,11 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     }
 
     private void setupRecyclerView() {
-        GridLayoutManager lm = new GridLayoutManager(this, calculateSpanCount());
-        mMovieList.setLayoutManager(lm);
+        mLayoutManager = new GridLayoutManager(this, calculateSpanCount());
+        mMovieList.setLayoutManager(mLayoutManager);
         mMovieAdapter = new MovieAdapter(mOnMovieClickListener, mTwoPane);
         mMovieList.setAdapter(mMovieAdapter);
-        mPaginatedListener = new PaginatedRecyclerViewScrollListener(lm) {
+        mPaginatedListener = new PaginatedRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page) {
                 mPresenter.fetchMovies(page);
@@ -112,12 +123,12 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
                 R.array.sort_by, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(mOnSortChangeListener);
     }
 
     @Override
     public void setMovies(List<Movie> movies) {
         if (mIsSortChanged) {
-            mMovieList.scrollToPosition(0);
             mMovieAdapter.resetData();
             mIsSortChanged = false;
         }
@@ -140,15 +151,26 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
 
     @Override
     public void setSortByPosition(int position) {
-        mSpinner.setOnItemSelectedListener(null);
         mSpinner.setSelection(position);
-        mSpinner.setOnItemSelectedListener(mOnSortChangeListener);
+    }
+
+    @Override
+    public void restoreScrollState(@Nullable Parcelable state) {
+        if (state != null) {
+            mLayoutManager.onRestoreInstanceState(state);
+        }
     }
 
     @Override
     public void resetMoviesList() {
         mPaginatedListener.reset();
         mIsSortChanged = true;
+    }
+
+    @Override
+    public void showSnack(int stringResId) {
+        Snackbar.make(mMovieList, stringResId, Snackbar.LENGTH_SHORT).show();
+//        Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
     }
 
     private void addFragment(Movie movie) {

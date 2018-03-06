@@ -1,5 +1,8 @@
 package io.github.vladimirmi.popularmovies.presentation.movielist;
 
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
@@ -20,4 +23,8 @@ public interface MovieListView extends BaseView {
     void setSelected(Movie lastSelected);
 
     void showLoading(boolean show);
+
+    void restoreScrollState(@Nullable Parcelable state);
+
+    void showSnack(int stringResId);
 }

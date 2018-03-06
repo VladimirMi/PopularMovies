@@ -3,18 +3,29 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="4dp"
     android:layout_gravity="center_horizontal"
+    android:padding="2dp"
     >
 
     <io.github.vladimirmi.popularmovies.utils.AspectRatioImageView
         android:id="@+id/thumb"
         android:layout_width="200dp"
         android:layout_height="match_parent"
+        android:contentDescription="@string/movie_trailer"
         app:aspectRatio="0.5625"
         app:aspectRatioEnabled="true"
         app:dominantMeasurement="width"
+        tools:background="@color/primaryColor"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/movie_trailer"
+        android:scaleType="center"
+        android:src="@drawable/ic_play"
         />
 </FrameLayout>

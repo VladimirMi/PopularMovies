@@ -9,8 +9,8 @@
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#b2ffffff</color>
 
-    <color name="grey_800">#96424242</color>
-    <color name="grey_700">#616161</color>
-    <color name="grey_400">#bdbdbd</color>
+    <color name="grey_800">#8d424242</color>
+    <color name="grad_start">#c5212121</color>
+    <color name="grad_end">#c5757575</color>
     <color name="transparent">#00ffffff</color>
 </resources>

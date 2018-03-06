@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Review;
 import io.github.vladimirmi.popularmovies.data.entity.Video;
+import io.github.vladimirmi.popularmovies.data.net.NetworkChecker;
 import io.github.vladimirmi.popularmovies.presentation.moviedetails.MovieDetailInteractor;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -15,13 +16,16 @@ import io.reactivex.Single;
  * Created by Vladimir Mikhalev 03.03.2018.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class MovieDetailInteractorImpl implements MovieDetailInteractor {
 
     private final DataRepository mRepository;
+    private final NetworkChecker mChecker;
 
     @Inject
-    public MovieDetailInteractorImpl(DataRepository repository) {
+    public MovieDetailInteractorImpl(DataRepository repository, NetworkChecker checker) {
         mRepository = repository;
+        mChecker = checker;
     }
 
     @Override
@@ -31,8 +35,11 @@ public class MovieDetailInteractorImpl implements MovieDetailInteractor {
                 .flatMap(favorite -> {
                     if (favorite) {
                         return mRepository.getTrailersFromNet(id)
-                                .flatMapCompletable(videos -> mRepository.updateTrailers(videos, id))
-                                .andThen(mRepository.getTrailersFromDb(id))
+                                .flatMapCompletable(videos -> mRepository.updateTrailers(videos, id)
+                                        .filter(updated -> updated == 0)
+                                        .flatMapSingle(integer -> mRepository.insertTrailers(videos, id))
+                                        .toCompletable()
+                                ).andThen(mRepository.getTrailersFromDb(id))
                                 .onErrorResumeNext(mRepository.getTrailersFromDb(id));
                     } else {
                         return mRepository.getTrailersFromNet(id);
@@ -47,8 +54,11 @@ public class MovieDetailInteractorImpl implements MovieDetailInteractor {
                 .flatMap(favorite -> {
                     if (favorite) {
                         return mRepository.getReviewsFromNet(id, page)
-                                .flatMapCompletable(videos -> mRepository.updateReviews(videos, id))
-                                .andThen(mRepository.getReviewsFromDb(id))
+                                .flatMapCompletable(reviews -> mRepository.updateReviews(reviews, id)
+                                        .filter(updated -> updated == 0)
+                                        .flatMapSingle(integer -> mRepository.insertReviews(reviews, id))
+                                        .toCompletable()
+                                ).andThen(mRepository.getReviewsFromDb(id))
                                 .onErrorResumeNext(mRepository.getReviewsFromDb(id));
                     } else {
                         return mRepository.getReviewsFromNet(id, page);
@@ -71,5 +81,10 @@ public class MovieDetailInteractorImpl implements MovieDetailInteractor {
     @Override
     public Completable addFavorite(Movie movie, List<Review> reviews, List<Video> videos) {
         return mRepository.addFavorite(movie, reviews, videos);
+    }
+
+    @Override
+    public boolean isNetAvailable() {
+        return mChecker.isAvailableNet();
     }
 }

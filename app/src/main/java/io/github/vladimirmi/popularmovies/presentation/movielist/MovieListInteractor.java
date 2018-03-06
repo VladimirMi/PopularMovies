@@ -22,4 +22,6 @@ public interface MovieListInteractor {
     void saveSortBy(Sort sortBy);
 
     Sort getSortBy();
+
+    boolean isNetAvailable();
 }

@@ -13,6 +13,9 @@
     <string name="remove_from_favorite">Remove from favorite</string>
     <string name="toast_favorite_add">Added to favorites</string>
     <string name="toast_favorite_remove">Removed from favorites</string>
+    <string name="movie_trailer">Movie trailer</string>
+    <string name="empty_favorites">List of favorites is empty</string>
+    <string name="no_connection">No connection</string>
 
     <string-array name="sort_by">
         <item>Most popular</item>

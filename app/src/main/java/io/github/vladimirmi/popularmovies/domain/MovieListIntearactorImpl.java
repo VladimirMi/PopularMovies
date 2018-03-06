@@ -57,4 +57,9 @@ public class MovieListIntearactorImpl implements MovieListInteractor {
         }
         return sortBy;
     }
+
+    @Override
+    public boolean isNetAvailable() {
+        return mChecker.isAvailableNet();
+    }
 }

@@ -63,7 +63,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             }
         });
 
-        mMovies = movies;
+        mMovies = new ArrayList<>(movies);
         diffResult.dispatchUpdatesTo(this);
     }
 
@@ -110,21 +110,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final ImageView mPosterView;
-        private final TextView mTitleView;
+        private final ImageView mPoster;
+        private final TextView mTitle;
+        private final TextView mRating;
         private Movie mMovie;
 
         MovieViewHolder(View itemView) {
             super(itemView);
-            mPosterView = itemView.findViewById(R.id.poster);
-            mTitleView = itemView.findViewById(R.id.title);
+            mPoster = itemView.findViewById(R.id.poster);
+            mTitle = itemView.findViewById(R.id.title);
+            mRating = itemView.findViewById(R.id.rating);
             itemView.setOnClickListener(this);
         }
 
         void bind(Movie movie) {
             mMovie = movie;
-            mTitleView.setText(movie.getTitle());
-            Utils.setImage(mPosterView, movie.getPosterUrl(Api.PosterSize.LOW));
+            mTitle.setText(movie.getTitle());
+            mRating.setText(String.valueOf(movie.getVoteAverage()));
+            Utils.setImage(mPoster, movie.getPosterUrl(Api.PosterSize.LOW));
         }
 
         @Override

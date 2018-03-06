@@ -127,50 +127,82 @@ public class DataRepositoryImpl implements DataRepository {
     @Override
     public Completable addFavorite(Movie movie, List<Review> reviews, List<Video> videos) {
         String movieId = String.valueOf(movie.getId());
-        Uri movieUri = MovieContract.MovieEntry.CONTENT_URI;
-        Uri reviewUri = MovieContract.ReviewEntry.CONTENT_URI;
-        Uri videoUri = MovieContract.VideoEntry.CONTENT_URI;
 
-        ContentValues movieValue = ValuesMapper.createValue(movie);
-        ContentValues[] reviewsValue =
-                ValuesMapper.createValues(reviews, review -> ValuesMapper.createValue(review, movieId));
-        ContentValues[] videosValue =
-                ValuesMapper.createValues(videos, video -> ValuesMapper.createValue(video, movieId));
-
-        return Completable.mergeArray(
-                Completable.fromAction(() -> mResolver.insert(movieUri, movieValue)),
-                Completable.fromAction(() -> mResolver.bulkInsert(reviewUri, reviewsValue)),
-                Completable.fromAction(() -> mResolver.bulkInsert(videoUri, videosValue))
-        ).subscribeOn(Schedulers.io());
+        return Single.merge(insertMovie(movie), insertReviews(reviews, movieId),
+                insertTrailers(videos, movieId))
+                .ignoreElements()
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Completable updateMovie(Movie movie) {
+    public Single<Boolean> insertMovie(Movie movie) {
+        Uri movieUri = MovieContract.MovieEntry.CONTENT_URI;
+        ContentValues movieValue = ValuesMapper.createValue(movie);
+
+        return Single.fromCallable(() -> mResolver.insert(movieUri, movieValue))
+                .map(uri -> uri != null)
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<Boolean> insertReviews(List<Review> reviews, String movieId) {
+        Uri reviewUri = MovieContract.ReviewEntry.CONTENT_URI;
+
+        ContentValues[] reviewsValue =
+                ValuesMapper.createValues(reviews, review -> ValuesMapper.createValue(review, movieId));
+
+        return Single.fromCallable(() -> mResolver.bulkInsert(reviewUri, reviewsValue))
+                .map(integer -> integer > 0)
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<Boolean> insertTrailers(List<Video> videos, String movieId) {
+        Uri videoUri = MovieContract.VideoEntry.CONTENT_URI;
+
+        ContentValues[] videosValue =
+                ValuesMapper.createValues(videos, video -> ValuesMapper.createValue(video, movieId));
+
+        return Single.fromCallable(() -> mResolver.bulkInsert(videoUri, videosValue))
+                .map(uri -> uri != null)
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<Integer> updateMovie(Movie movie) {
         String movieId = String.valueOf(movie.getId());
         Uri movieUri = MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
         ContentValues movieValue = ValuesMapper.createValue(movie);
 
-        return Completable.fromAction(() -> mResolver.insert(movieUri, movieValue))
+        return Single.fromCallable(() -> mResolver.update(movieUri, movieValue, null, null))
                 .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Completable updateReviews(List<Review> reviews, String movieId) {
+    public Single<Integer> updateReviews(List<Review> reviews, String movieId) {
         Uri reviewUri = MovieContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
         ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(reviewUri,
                 reviews, review -> ValuesMapper.createValue(review, movieId));
 
-        return Completable.fromAction(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
+        return Single.fromCallable(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
+                .flatMapObservable(Observable::fromArray)
+                .map(result -> result.count)
+                .scan((count1, count2) -> count1 + count2)
+                .last(0)
                 .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Completable updateTrailers(List<Video> videos, String movieId) {
+    public Single<Integer> updateTrailers(List<Video> videos, String movieId) {
         Uri videoUri = MovieContract.VideoEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
         ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(videoUri,
                 videos, video -> ValuesMapper.createValue(video, movieId));
 
-        return Completable.fromAction(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
+        return Single.fromCallable(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
+                .flatMapObservable(Observable::fromArray)
+                .map(result -> result.count)
+                .scan((count1, count2) -> count1 + count2)
+                .last(0)
                 .subscribeOn(Schedulers.io());
     }
 }

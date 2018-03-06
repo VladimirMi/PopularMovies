@@ -34,6 +34,9 @@ public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
 
     @Override
     protected void onFirstAttach(MovieDetailsView view) {
+        if (!mInteractor.isNetAvailable()) {
+            view.showSnack(R.string.no_connection);
+        }
         mCompDisp.add(fetchTrailers());
         mCompDisp.add(fetchReviews(1));
         mCompDisp.add(isFavorite());
@@ -98,12 +101,12 @@ public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
         if (mIsFavorite) {
             mCompDisp.add(mInteractor.removeFavorite(mMovie.getId())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> mView.showToast(R.string.toast_favorite_remove),
+                    .subscribe(() -> mView.showSnack(R.string.toast_favorite_remove),
                             Timber::e));
         } else {
             mCompDisp.add(mInteractor.addFavorite(mMovie, mReviews, mVideos)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> mView.showToast(R.string.toast_favorite_add),
+                    .subscribe(() -> mView.showSnack(R.string.toast_favorite_add),
                             Timber::e));
         }
         mIsFavorite = !mIsFavorite;

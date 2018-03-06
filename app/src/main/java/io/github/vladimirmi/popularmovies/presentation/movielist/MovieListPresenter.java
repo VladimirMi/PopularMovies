@@ -1,10 +1,15 @@
 package io.github.vladimirmi.popularmovies.presentation.movielist;
 
+import android.os.Parcelable;
+import android.util.SparseArray;
+
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
 import io.github.vladimirmi.popularmovies.data.entity.Sort;
 import io.github.vladimirmi.popularmovies.presentation.core.BasePresenter;
@@ -17,6 +22,7 @@ import timber.log.Timber;
  * Created by Vladimir Mikhalev 02.03.2018.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     private final MovieListInteractor mInteractor;
@@ -24,6 +30,7 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private final List<Movie> mPopularMovies = new ArrayList<>();
     private final List<Movie> mTopMovies = new ArrayList<>();
     private Movie mLastSelected;
+    private SparseArray<Parcelable> scrollBySort = new SparseArray<>();
 
     @Inject
     public MovieListPresenter(MovieListInteractor interactor) {
@@ -33,6 +40,9 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     @Override
     protected void onFirstAttach(MovieListView view) {
         mSortBy = mInteractor.getSortBy();
+        if (!mInteractor.isNetAvailable()) {
+            view.showSnack(R.string.no_connection);
+        }
         fetchMovies(1);
     }
 
@@ -44,7 +54,6 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     }
 
     public void fetchMovies(int page) {
-        mView.showLoading(true);
         switch (mSortBy) {
             case POPULAR:
                 mCompDisp.clear();
@@ -70,6 +79,10 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
         setMovies();
     }
 
+    public void saveScrollState(Parcelable state) {
+        scrollBySort.put(mSortBy.ordinal(), state);
+    }
+
     private void setMovies() {
         switch (mSortBy) {
             case POPULAR:
@@ -83,6 +96,7 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
                 break;
         }
         mView.setSelected(mLastSelected);
+        mView.restoreScrollState(scrollBySort.get(mSortBy.ordinal()));
     }
 
     private void setOrFetchIfEmpty(List<Movie> movies) {
@@ -101,7 +115,16 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
                     public void onSuccess(List<Movie> movies) {
                         initLastSelected(movies);
                         mPopularMovies.addAll(movies);
+                        mView.showLoading(false);
                         mView.setMovies(mPopularMovies);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        if (e instanceof SocketTimeoutException) {
+                            mView.showSnack(R.string.no_connection);
+                        }
                     }
                 });
     }
@@ -109,12 +132,22 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private Disposable fetchTopRatedMovies(int page) {
         return mInteractor.getTopRatedMovies(page)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mView.showLoading(true))
                 .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
                     public void onSuccess(List<Movie> movies) {
                         initLastSelected(movies);
                         mTopMovies.addAll(movies);
+                        mView.showLoading(false);
                         mView.setMovies(mTopMovies);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        if (e instanceof SocketTimeoutException) {
+                            mView.showSnack(R.string.no_connection);
+                        }
                     }
                 });
     }
@@ -122,8 +155,12 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private Disposable fetchFavoriteMovies() {
         return mInteractor.getFavoriteMovies()
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mView.showLoading(true))
                 .subscribe(movies -> {
                     initLastSelected(movies);
+                    if (movies.isEmpty()) {
+                        mView.showSnack(R.string.empty_favorites);
+                    }
                     mView.setMovies(movies);
                 }, Timber::e);
     }
@@ -133,9 +170,8 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     }
 
     private void initLastSelected(List<Movie> movies) {
-        if (mLastSelected == null && !movies.isEmpty()) {
+        if (!movies.isEmpty()) {
             mLastSelected = movies.get(0);
-            mView.setSelected(mLastSelected);
         }
     }
 }

@@ -23,4 +23,6 @@ public interface MovieDetailInteractor {
     Completable removeFavorite(int movieId);
 
     Completable addFavorite(Movie movie, List<Review> reviews, List<Video> videos);
+
+    boolean isNetAvailable();
 }

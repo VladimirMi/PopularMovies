@@ -40,9 +40,15 @@ public interface DataRepository {
 
     Completable addFavorite(Movie movie, List<Review> reviews, List<Video> videos);
 
-    Completable updateMovie(Movie movie);
+    Single<Boolean> insertMovie(Movie movie);
 
-    Completable updateReviews(List<Review> reviews, String movieId);
+    Single<Boolean> insertReviews(List<Review> reviews, String movieId);
 
-    Completable updateTrailers(List<Video> videos, String movieId);
+    Single<Boolean> insertTrailers(List<Video> videos, String movieId);
+
+    Single<Integer> updateMovie(Movie movie);
+
+    Single<Integer> updateReviews(List<Review> reviews, String movieId);
+
+    Single<Integer> updateTrailers(List<Video> videos, String movieId);
 }

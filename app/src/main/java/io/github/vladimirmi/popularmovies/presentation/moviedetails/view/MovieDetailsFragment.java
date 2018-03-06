@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,7 +24,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -196,7 +196,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mTrailers.removeAllViews();
         for (Video video : videos) {
-            View thumbContainer = inflater.inflate(R.layout.view_video_thumbnail, mTrailers, false);
+            View thumbContainer = inflater.inflate(R.layout.item_video_thumbnail, mTrailers, false);
             ImageView thumb = thumbContainer.findViewById(R.id.thumb);
             Utils.setImage(thumb, video.getThumbnailUrl());
             mTrailers.addView(thumbContainer);
@@ -222,8 +222,9 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     }
 
     @Override
-    public void showToast(int stringResId) {
-        Toast.makeText(getContext(), stringResId, Toast.LENGTH_SHORT).show();
+    public void showSnack(int stringResId) {
+        Snackbar.make(getActivity().findViewById(android.R.id.content),
+                stringResId, Snackbar.LENGTH_SHORT).show();
     }
 
     private void setupToolbar(Movie movie) {
