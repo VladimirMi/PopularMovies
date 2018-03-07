@@ -9,7 +9,7 @@ import io.github.vladimirmi.popularmovies.data.db.MovieContract.MovieEntry;
 import io.github.vladimirmi.popularmovies.data.db.MovieContract.ReviewEntry;
 import io.github.vladimirmi.popularmovies.data.db.MovieContract.VideoEntry;
 
-public class FavoriteDbHelper extends SQLiteOpenHelper {
+public class MovieDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "favorites.db";
     private static final int DATABASE_VERSION = 2;
@@ -28,21 +28,21 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " +
             VideoEntry.TABLE_NAME + " (" +
             VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            VideoEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
             VideoEntry.COLUMN_SERVER_ID + " TEXT UNIQUE NOT NULL," +
+            VideoEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
             VideoEntry.COLUMN_NAME + " TEXT NOT NULL," +
             VideoEntry.COLUMN_KEY + " TEXT NOT NULL)";
 
     private static final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " +
             ReviewEntry.TABLE_NAME + " (" +
             ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            ReviewEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
             ReviewEntry.COLUMN_SERVER_ID + " TEXT UNIQUE NOT NULL," +
+            ReviewEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
             ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL," +
             ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL)";
 
 
-    public FavoriteDbHelper(Context context) {
+    public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

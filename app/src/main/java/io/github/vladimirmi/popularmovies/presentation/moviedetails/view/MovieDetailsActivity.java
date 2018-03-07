@@ -2,6 +2,7 @@ package io.github.vladimirmi.popularmovies.presentation.moviedetails.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import io.github.vladimirmi.popularmovies.R;
 import io.github.vladimirmi.popularmovies.data.entity.Movie;
@@ -32,5 +33,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     .add(R.id.movie_details_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
     }
 }

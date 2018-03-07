@@ -1,9 +1,7 @@
 package io.github.vladimirmi.popularmovies.data.db;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.net.Uri;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,19 +109,5 @@ public class ValuesMapper {
             }
         }
         return values;
-    }
-
-    public static <T> ArrayList<ContentProviderOperation> updateOperationsFor(Uri uri, List<T> list, Function<T, ContentValues> mapper) {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>(list.size());
-        for (T item : list) {
-            try {
-                operations.add(ContentProviderOperation.newUpdate(uri)
-                        .withValues(mapper.apply(item))
-                        .build());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return operations;
     }
 }

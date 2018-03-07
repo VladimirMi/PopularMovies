@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 
 import io.github.vladimirmi.popularmovies.di.AppModule;
 import io.github.vladimirmi.popularmovies.di.Scopes;
-import timber.log.Timber;
 
 /**
  * Created by Vladimir Mikhalev 05.03.2018.
@@ -25,9 +24,11 @@ public class MovieContentProvider extends ContentProvider {
     private static final int MOVIES = 100;
     private static final int MOVIE_FOR_ID = 101;
     private static final int REVIEWS = 200;
-    private static final int REVIEWS_FOR_MOVIE = 201;
+    private static final int REVIEW_FOR_ID = 201;
+    private static final int REVIEWS_FOR_MOVIE = 202;
     private static final int VIDEOS = 300;
-    private static final int VIDEOS_FOR_MOVIE = 301;
+    private static final int VIDEO_FOR_ID = 301;
+    private static final int VIDEOS_FOR_MOVIE = 302;
 
     private UriMatcher mMatcher;
     private SQLiteDatabase mDb;
@@ -35,7 +36,6 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Timber.e("onCreate: ");
         Scopes.getAppScope().installModules(new AppModule(getContext()));
         mMatcher = buildUriMatcher();
         mDb = Scopes.getAppScope().getInstance(SQLiteDatabase.class);
@@ -55,14 +55,14 @@ public class MovieContentProvider extends ContentProvider {
                 tableName = MovieContract.MovieEntry.TABLE_NAME;
                 sortOrder = MovieContract.MovieEntry.COLUMN_TIMESTAMP + " DESC";
                 break;
-            case MOVIE_FOR_ID:
-                tableName = MovieContract.MovieEntry.TABLE_NAME;
-                selection = MovieContract.MovieEntry._ID + " = ?";
-                selectionArgs = new String[]{uri.getLastPathSegment()};
-                break;
             case REVIEWS_FOR_MOVIE:
                 tableName = MovieContract.ReviewEntry.TABLE_NAME;
                 selection = MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ?";
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                break;
+            case MOVIE_FOR_ID:
+                tableName = MovieContract.MovieEntry.TABLE_NAME;
+                selection = MovieContract.MovieEntry._ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
             case VIDEOS_FOR_MOVIE:
@@ -158,7 +158,6 @@ public class MovieContentProvider extends ContentProvider {
         return deleted;
     }
 
-
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         int match = mMatcher.match(uri);
@@ -170,12 +169,12 @@ public class MovieContentProvider extends ContentProvider {
                 selection = MovieContract.MovieEntry._ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
-            case REVIEWS_FOR_MOVIE:
+            case REVIEW_FOR_ID:
                 tableName = MovieContract.ReviewEntry.TABLE_NAME;
                 selection = MovieContract.ReviewEntry.COLUMN_SERVER_ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
-            case VIDEOS_FOR_MOVIE:
+            case VIDEO_FOR_ID:
                 tableName = MovieContract.VideoEntry.TABLE_NAME;
                 selection = MovieContract.VideoEntry.COLUMN_SERVER_ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
@@ -184,12 +183,12 @@ public class MovieContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
+//        Timber.e("update: %s", uri);
         int updated = mDb.update(tableName, values, selection, selectionArgs);
 
         if (updated != 0) {
             mResolver.notifyChange(uri, null);
         }
-
         return updated;
     }
 
@@ -208,6 +207,8 @@ public class MovieContentProvider extends ContentProvider {
         matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIES + "/#", MOVIE_FOR_ID);
         matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_REVIEWS + "/#", REVIEWS_FOR_MOVIE);
         matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_VIDEOS + "/#", VIDEOS_FOR_MOVIE);
+        matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_REVIEWS + "/*", REVIEW_FOR_ID);
+        matcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_VIDEOS + "/*", VIDEO_FOR_ID);
 
         return matcher;
     }

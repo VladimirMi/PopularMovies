@@ -111,4 +111,19 @@ public class Movie implements Parcelable {
     private String getImagePath(Api.ImageSize size, String path) {
         return String.format(Api.BASE_IMAGE_URL, size.getPath(), path);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Movie movie = (Movie) o;
+
+        return id == movie.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

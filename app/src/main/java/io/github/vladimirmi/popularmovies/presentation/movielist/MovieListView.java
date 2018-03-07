@@ -20,11 +20,15 @@ public interface MovieListView extends BaseView {
 
     void resetMoviesList();
 
-    void setSelected(Movie lastSelected);
+    void restoreLastSelected(Movie lastSelected);
 
     void showLoading(boolean show);
 
     void restoreScrollState(@Nullable Parcelable state);
 
     void showSnack(int stringResId);
+
+    void showDetails(Movie movie, boolean isSame);
+
+    void hideDetails();
 }

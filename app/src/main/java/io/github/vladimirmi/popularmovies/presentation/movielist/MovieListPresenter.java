@@ -26,11 +26,12 @@ import timber.log.Timber;
 public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     private final MovieListInteractor mInteractor;
-    private Sort mSortBy;
+
+    private Sort mSort;
     private final List<Movie> mPopularMovies = new ArrayList<>();
     private final List<Movie> mTopMovies = new ArrayList<>();
-    private Movie mLastSelected;
-    private SparseArray<Parcelable> scrollBySort = new SparseArray<>();
+    private SparseArray<Parcelable> mScrollStateBySort = new SparseArray<>();
+    private SparseArray<Movie> mSelectedBySort = new SparseArray<>();
 
     @Inject
     public MovieListPresenter(MovieListInteractor interactor) {
@@ -39,7 +40,7 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     @Override
     protected void onFirstAttach(MovieListView view) {
-        mSortBy = mInteractor.getSortBy();
+        mSort = mInteractor.getSortBy();
         if (!mInteractor.isNetAvailable()) {
             view.showSnack(R.string.no_connection);
         }
@@ -48,23 +49,21 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     @Override
     protected void onAttach(MovieListView view) {
-        view.setSortByPosition(mSortBy.ordinal());
+        view.setSortByPosition(mSort.ordinal());
         if (isFirstAttach) return;
         setMovies();
     }
 
     public void fetchMovies(int page) {
-        switch (mSortBy) {
+        mCompDisp.clear();
+        switch (mSort) {
             case POPULAR:
-                mCompDisp.clear();
                 mCompDisp.add(fetchPopularMovies(page));
                 break;
             case TOP_RATED:
-                mCompDisp.clear();
                 mCompDisp.add(fetchTopRatedMovies(page));
                 break;
             case FAVORITE:
-                mCompDisp.clear();
                 mCompDisp.add(fetchFavoriteMovies());
                 break;
         }
@@ -72,51 +71,51 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
 
     public void saveSortByPosition(int position) {
         Sort sortBy = Sort.values()[position];
-        if (sortBy == mSortBy) return;
-        mSortBy = sortBy;
-        mInteractor.saveSortBy(mSortBy);
+        if (sortBy == mSort) return;
+        mSort = sortBy;
+        mInteractor.saveSortBy(mSort);
         mView.resetMoviesList();
         setMovies();
     }
 
     public void saveScrollState(Parcelable state) {
-        scrollBySort.put(mSortBy.ordinal(), state);
+        mScrollStateBySort.put(mSort.ordinal(), state);
+    }
+
+    public void selectMovie(Movie movie) {
+        mSelectedBySort.put(mSort.ordinal(), movie);
+        boolean isSame = lastSelected() == null || lastSelected().getId() != movie.getId();
+        mView.showDetails(movie, isSame);
     }
 
     private void setMovies() {
-        switch (mSortBy) {
-            case POPULAR:
-                setOrFetchIfEmpty(mPopularMovies);
-                break;
-            case TOP_RATED:
-                setOrFetchIfEmpty(mTopMovies);
-                break;
-            case FAVORITE:
-                fetchMovies(1);
-                break;
-        }
-        mView.setSelected(mLastSelected);
-        mView.restoreScrollState(scrollBySort.get(mSortBy.ordinal()));
-    }
-
-    private void setOrFetchIfEmpty(List<Movie> movies) {
-        if (!movies.isEmpty()) {
-            mView.setMovies(movies);
+        if (mSort == Sort.POPULAR && !mPopularMovies.isEmpty()) {
+            mView.setMovies(mPopularMovies);
+            restoreState();
+        } else if (mSort == Sort.TOP_RATED && !mTopMovies.isEmpty()) {
+            mView.setMovies(mTopMovies);
+            restoreState();
         } else {
             fetchMovies(1);
         }
     }
 
+    private void restoreState() {
+        mView.restoreScrollState(mScrollStateBySort.get(mSort.ordinal()));
+        mView.restoreLastSelected(lastSelected());
+    }
+
     private Disposable fetchPopularMovies(int page) {
         return mInteractor.getPopularMovies(page)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mView.showLoading(true))
+                .doOnDispose(() -> mView.showLoading(false))
                 .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
                     public void onSuccess(List<Movie> movies) {
-                        initLastSelected(movies);
                         mPopularMovies.addAll(movies);
-                        mView.showLoading(false);
                         mView.setMovies(mPopularMovies);
+                        initLastSelected(movies);
                     }
 
                     @Override
@@ -133,13 +132,13 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
         return mInteractor.getTopRatedMovies(page)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mView.showLoading(true))
+                .doOnDispose(() -> mView.showLoading(false))
                 .subscribeWith(new SimpleSingleObserver<List<Movie>>() {
                     @Override
                     public void onSuccess(List<Movie> movies) {
-                        initLastSelected(movies);
                         mTopMovies.addAll(movies);
-                        mView.showLoading(false);
                         mView.setMovies(mTopMovies);
+                        initLastSelected(movies);
                     }
 
                     @Override
@@ -155,23 +154,29 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private Disposable fetchFavoriteMovies() {
         return mInteractor.getFavoriteMovies()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mView.showLoading(true))
                 .subscribe(movies -> {
-                    initLastSelected(movies);
+                    mView.setMovies(movies);
+
                     if (movies.isEmpty()) {
                         mView.showSnack(R.string.empty_favorites);
+                        mView.hideDetails();
+                    } else {
+                        if (!movies.contains(lastSelected())) {
+                            mSelectedBySort.put(mSort.ordinal(), movies.get(0));
+                        }
+                        restoreState();
                     }
-                    mView.setMovies(movies);
                 }, Timber::e);
     }
 
-    public void setLastSelectedMovie(Movie movie) {
-        mLastSelected = movie;
+    private void initLastSelected(List<Movie> movies) {
+        if (lastSelected() == null && !movies.isEmpty()) {
+            mSelectedBySort.put(mSort.ordinal(), movies.get(0));
+            mView.restoreLastSelected(lastSelected());
+        }
     }
 
-    private void initLastSelected(List<Movie> movies) {
-        if (!movies.isEmpty()) {
-            mLastSelected = movies.get(0);
-        }
+    private Movie lastSelected() {
+        return mSelectedBySort.get(mSort.ordinal());
     }
 }

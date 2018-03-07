@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
  * Default page size is 20.
  */
 
+@SuppressWarnings("WeakerAccess")
 public abstract class PaginatedRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
     private static final int PAGE_SIZE = 20;

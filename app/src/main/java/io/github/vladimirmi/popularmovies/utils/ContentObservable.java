@@ -22,7 +22,7 @@ import io.reactivex.disposables.Disposables;
 
 public class ContentObservable {
 
-    public static Observable<Cursor> create(ContentResolver resolver, Uri uri) {
+    public static Observable<Cursor> create(ContentResolver resolver, Uri parentUri, boolean notifyForDescendants) {
         HandlerThread handlerThread = new HandlerThread("ContentObservableThread",
                 Process.THREAD_PRIORITY_BACKGROUND);
         handlerThread.start();
@@ -30,21 +30,26 @@ public class ContentObservable {
         Scheduler scheduler = AndroidSchedulers.from(handlerThread.getLooper());
 
         return Observable.create((ObservableOnSubscribe<Cursor>) emitter -> {
-            final Cursor[] cursor = {resolver.query(uri, null, null, null, null)};
+            final Cursor[] cursor = {resolver.query(parentUri, null, null, null, null)};
             emitter.onNext(cursor[0]);
 
             ContentObserver observer = new ContentObserver(handler) {
                 @Override
-                public void onChange(boolean selfChange) {
+                public void onChange(boolean selfChange, Uri uri) {
                     if (!emitter.isDisposed()) {
                         cursor[0].close();
-                        cursor[0] = resolver.query(uri, null, null, null, null);
+                        cursor[0] = resolver.query(parentUri, null, null, null, null);
                         emitter.onNext(cursor[0]);
                     }
                 }
+
+                @Override
+                public void onChange(boolean selfChange) {
+                    onChange(selfChange, null);
+                }
             };
 
-            resolver.registerContentObserver(uri, false, observer);
+            resolver.registerContentObserver(parentUri, notifyForDescendants, observer);
 
             emitter.setDisposable(Disposables.fromRunnable(() -> {
                 cursor[0].close();

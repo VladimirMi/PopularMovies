@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -57,15 +58,7 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     private PaginatedRecyclerViewScrollListener mPaginatedListener;
 
     private final MovieAdapter.OnMovieClickListener mOnMovieClickListener = (movie) -> {
-        mPresenter.setLastSelectedMovie(movie);
-        if (mTwoPane) {
-            addFragment(movie);
-        } else {
-            Intent intent = new Intent(MovieListActivity.this, MovieDetailsActivity.class);
-            intent.putExtra(MovieDetailsFragment.ARG_MOVIE, movie);
-
-            startActivity(intent);
-        }
+        mPresenter.selectMovie(movie);
     };
 
     private final AdapterView.OnItemSelectedListener mOnSortChangeListener = new AdapterView.OnItemSelectedListener() {
@@ -138,15 +131,17 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     }
 
     @Override
-    public void setSelected(Movie selected) {
-        if (mTwoPane) {
+    public void restoreLastSelected(Movie selected) {
+        if (mTwoPane && selected != null) {
             addFragment(selected);
         }
     }
 
     @Override
-    public void showLoading(boolean show) {
-        mLoadIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
+    public void restoreScrollState(@Nullable Parcelable state) {
+        if (state != null) {
+            mLayoutManager.onRestoreInstanceState(state);
+        }
     }
 
     @Override
@@ -155,10 +150,8 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     }
 
     @Override
-    public void restoreScrollState(@Nullable Parcelable state) {
-        if (state != null) {
-            mLayoutManager.onRestoreInstanceState(state);
-        }
+    public void showLoading(boolean show) {
+        mLoadIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -170,17 +163,39 @@ public class MovieListActivity extends BaseActivity<MovieListPresenter, MovieLis
     @Override
     public void showSnack(int stringResId) {
         Snackbar.make(mMovieList, stringResId, Snackbar.LENGTH_SHORT).show();
-//        Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showDetails(Movie movie, boolean isSame) {
+        if (mTwoPane && !isSame) {
+            addFragment(movie);
+        } else {
+            Intent intent = new Intent(MovieListActivity.this, MovieDetailsActivity.class);
+            intent.putExtra(MovieDetailsFragment.ARG_MOVIE, movie);
+
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }
+    }
+
+    @Override
+    public void hideDetails() {
+        if (mTwoPane) {
+            findViewById(R.id.movie_details_container).setVisibility(View.GONE);
+        }
     }
 
     private void addFragment(Movie movie) {
+        findViewById(R.id.movie_details_container).setVisibility(View.VISIBLE);
         Bundle arguments = new Bundle();
         arguments.putParcelable(MovieDetailsFragment.ARG_MOVIE, movie);
         arguments.putBoolean(MovieDetailsFragment.ARG_TWO_PANE, true);
         MovieDetailsFragment fragment = new MovieDetailsFragment();
         fragment.setArguments(arguments);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.movie_details_container, fragment)
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        ft.replace(R.id.movie_details_container, fragment)
                 .commit();
     }
 

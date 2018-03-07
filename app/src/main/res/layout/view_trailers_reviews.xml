@@ -12,8 +12,8 @@
         style="@style/CustomTextView.Label"
         android:layout_marginBottom="4dp"
         android:text="@string/movie_trailers"
+        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:visibility="gone"
         />
 
@@ -37,8 +37,8 @@
         android:id="@+id/reviews_label"
         style="@style/CustomTextView.Label"
         android:layout_marginBottom="4dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:text="@string/movie_reviews"
         android:visibility="gone"
         />
@@ -47,6 +47,8 @@
         android:id="@+id/movie_reviews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         />

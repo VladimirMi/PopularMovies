@@ -11,6 +11,7 @@ import io.github.vladimirmi.popularmovies.data.net.NetworkChecker;
 import io.github.vladimirmi.popularmovies.presentation.moviedetails.MovieDetailInteractor;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import timber.log.Timber;
 
 /**
  * Created by Vladimir Mikhalev 03.03.2018.
@@ -37,10 +38,13 @@ public class MovieDetailInteractorImpl implements MovieDetailInteractor {
                         return mRepository.getTrailersFromNet(id)
                                 .flatMapCompletable(videos -> mRepository.updateTrailers(videos, id)
                                         .filter(updated -> updated == 0)
-                                        .flatMapSingle(integer -> mRepository.insertTrailers(videos, id))
-                                        .toCompletable()
-                                ).andThen(mRepository.getTrailersFromDb(id))
-                                .onErrorResumeNext(mRepository.getTrailersFromDb(id));
+                                        .flatMapCompletable(integer -> mRepository.insertTrailers(videos, id)
+                                                .toCompletable()))
+                                .andThen(mRepository.getTrailersFromDb(id))
+                                .onErrorResumeNext(throwable -> {
+                                    Timber.e(throwable);
+                                    return mRepository.getTrailersFromDb(id);
+                                });
                     } else {
                         return mRepository.getTrailersFromNet(id);
                     }
@@ -56,10 +60,13 @@ public class MovieDetailInteractorImpl implements MovieDetailInteractor {
                         return mRepository.getReviewsFromNet(id, page)
                                 .flatMapCompletable(reviews -> mRepository.updateReviews(reviews, id)
                                         .filter(updated -> updated == 0)
-                                        .flatMapSingle(integer -> mRepository.insertReviews(reviews, id))
-                                        .toCompletable()
-                                ).andThen(mRepository.getReviewsFromDb(id))
-                                .onErrorResumeNext(mRepository.getReviewsFromDb(id));
+                                        .flatMapCompletable(integer -> mRepository.insertReviews(reviews, id)
+                                                .toCompletable()))
+                                .andThen(mRepository.getReviewsFromDb(id))
+                                .onErrorResumeNext(throwable -> {
+                                    Timber.e(throwable);
+                                    return mRepository.getReviewsFromDb(id);
+                                });
                     } else {
                         return mRepository.getReviewsFromNet(id, page);
                     }

@@ -1,11 +1,9 @@
 package io.github.vladimirmi.popularmovies.data;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -59,14 +57,14 @@ public class DataRepositoryImpl implements DataRepository {
 
     @Override
     public Observable<List<Movie>> getFavoriteMovies() {
-        return ContentObservable.create(mResolver, MovieContract.MovieEntry.CONTENT_URI)
+        return ContentObservable.create(mResolver, MovieContract.MovieEntry.CONTENT_URI, true)
                 .map(cursor -> ValuesMapper.getList(cursor, ValuesMapper::cursorToMovie));
     }
 
     @Override
     public Single<Movie> getFavoriteMovie(String movieId) {
         Uri uri = MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-        return ContentObservable.create(mResolver, uri)
+        return ContentObservable.create(mResolver, uri, false)
                 .map(cursor -> {
                     cursor.moveToNext();
                     return ValuesMapper.cursorToMovie(cursor);
@@ -89,7 +87,7 @@ public class DataRepositoryImpl implements DataRepository {
     @Override
     public Single<List<Video>> getTrailersFromDb(String movieId) {
         Uri uri = MovieContract.VideoEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-        return ContentObservable.create(mResolver, uri)
+        return ContentObservable.create(mResolver, uri, false)
                 .map(cursor -> ValuesMapper.getList(cursor, ValuesMapper::cursorToVideo))
                 .firstOrError();
     }
@@ -97,7 +95,7 @@ public class DataRepositoryImpl implements DataRepository {
     @Override
     public Single<List<Review>> getReviewsFromDb(String movieId) {
         Uri uri = MovieContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-        return ContentObservable.create(mResolver, uri)
+        return ContentObservable.create(mResolver, uri, false)
                 .map(cursor -> ValuesMapper.getList(cursor, ValuesMapper::cursorToReview))
                 .firstOrError();
     }
@@ -180,13 +178,12 @@ public class DataRepositoryImpl implements DataRepository {
 
     @Override
     public Single<Integer> updateReviews(List<Review> reviews, String movieId) {
-        Uri reviewUri = MovieContract.ReviewEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-        ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(reviewUri,
-                reviews, review -> ValuesMapper.createValue(review, movieId));
+        Uri baseUri = MovieContract.ReviewEntry.CONTENT_URI;
 
-        return Single.fromCallable(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
-                .flatMapObservable(Observable::fromArray)
-                .map(result -> result.count)
+        return Observable.fromIterable(reviews)
+                .map(review -> mResolver.update(baseUri.buildUpon().appendPath(review.getId()).build(),
+                        ValuesMapper.createValue(review, movieId),
+                        null, null))
                 .scan((count1, count2) -> count1 + count2)
                 .last(0)
                 .subscribeOn(Schedulers.io());
@@ -194,13 +191,12 @@ public class DataRepositoryImpl implements DataRepository {
 
     @Override
     public Single<Integer> updateTrailers(List<Video> videos, String movieId) {
-        Uri videoUri = MovieContract.VideoEntry.CONTENT_URI.buildUpon().appendPath(movieId).build();
-        ArrayList<ContentProviderOperation> operations = ValuesMapper.updateOperationsFor(videoUri,
-                videos, video -> ValuesMapper.createValue(video, movieId));
+        Uri baseUri = MovieContract.VideoEntry.CONTENT_URI;
 
-        return Single.fromCallable(() -> mResolver.applyBatch(MovieContract.AUTHORITY, operations))
-                .flatMapObservable(Observable::fromArray)
-                .map(result -> result.count)
+        return Observable.fromIterable(videos)
+                .map(video -> mResolver.update(baseUri.buildUpon().appendPath(video.getId()).build(),
+                        ValuesMapper.createValue(video, movieId),
+                        null, null))
                 .scan((count1, count2) -> count1 + count2)
                 .last(0)
                 .subscribeOn(Schedulers.io());

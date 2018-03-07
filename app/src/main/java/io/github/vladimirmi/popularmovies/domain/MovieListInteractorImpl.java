@@ -15,13 +15,13 @@ import io.reactivex.Single;
  * Created by Vladimir Mikhalev 03.03.2018.
  */
 
-public class MovieListIntearactorImpl implements MovieListInteractor {
+public class MovieListInteractorImpl implements MovieListInteractor {
 
     private final DataRepository mRepository;
     private final NetworkChecker mChecker;
 
     @Inject
-    public MovieListIntearactorImpl(DataRepository repository, NetworkChecker checker) {
+    public MovieListInteractorImpl(DataRepository repository, NetworkChecker checker) {
         mRepository = repository;
         mChecker = checker;
     }

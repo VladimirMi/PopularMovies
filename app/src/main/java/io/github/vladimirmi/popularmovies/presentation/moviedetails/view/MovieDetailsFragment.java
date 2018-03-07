@@ -78,7 +78,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     private boolean mTwoPane;
     private ReviewsAdapter mReviewsAdapter;
     private int mScopeName;
-    private boolean mIsFabVisible;
+    private boolean mIsFabVisible = true;
     private boolean mIsFavorite;
 
     public MovieDetailsFragment() {
@@ -110,9 +110,10 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity().isFinishing()) {
+    public void onDestroyView() {
+        super.onDestroyView();
+        getActivity().invalidateOptionsMenu();
+        if (mTwoPane || getActivity().isFinishing()) {
             Toothpick.closeScope(mScopeName);
         }
     }
@@ -133,9 +134,6 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
         switch (item.getItemId()) {
             case R.id.menu_favorite:
                 mPresenter.switchFavorite();
-                return true;
-            case android.R.id.home:
-                getActivity().onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -202,15 +200,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
             mTrailers.addView(thumbContainer);
             thumb.setOnClickListener(v -> playOnYouTube(video.getKey(), video.getUrl()));
         }
-        Utils.runAfterMeasure(mTrailersScroll, () -> {
-            if (!Utils.canScrollHorizontal(mTrailersScroll)) {
-                HorizontalScrollView.LayoutParams lp = (HorizontalScrollView.LayoutParams)
-                        mTrailers.getLayoutParams();
-                lp.gravity = Gravity.CENTER;
-                mTrailers.setGravity(Gravity.CENTER);
-                mTrailers.setLayoutParams(lp);
-            }
-        });
+        centerVideos();
     }
 
     @Override
@@ -240,6 +230,20 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter, Mo
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
         }
+    }
+
+    private void centerVideos() {
+        if (getView() == null) return;
+        Utils.runAfterMeasure(mTrailersScroll, () -> {
+            if (getView() == null) return;
+            if (!Utils.canScrollHorizontal(mTrailersScroll)) {
+                HorizontalScrollView.LayoutParams lp = (HorizontalScrollView.LayoutParams)
+                        mTrailers.getLayoutParams();
+                lp.gravity = Gravity.CENTER;
+                mTrailers.setGravity(Gravity.CENTER);
+                mTrailers.setLayoutParams(lp);
+            }
+        });
     }
 
 
